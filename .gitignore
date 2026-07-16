@@ -1,0 +1,14 @@
+# Non-website folders — never push these
+gsd-template/
+project-brain/
+.vscode/
+
+# Standard excludes
+node_modules/
+.env
+.env.*.local
+*.log
+.DS_Store
+dist/
+dist-ssr/
+backend/uploads/

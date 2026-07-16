@@ -1,0 +1,463 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-sans antialiased transition-colors duration-300;
+  }
+  
+  h1, h2, h3, h4, .font-serif-luxury {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply tracking-tight text-navy-dark;
+  }
+  
+  h1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.1];
+  }
+  
+  h2 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-normal leading-[1.15];
+  }
+  
+  h3 {
+    @apply text-xl sm:text-2xl font-normal leading-[1.2];
+  }
+}
+
+@layer components {
+  /* Premium Glassmorphism Utility */
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glassmorphism-dark {
+    background: rgba(15, 39, 68, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Shimmer / Loader skeleton utility */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      #f0f3f6 25%,
+      #e2e8f0 50%,
+      #f0f3f6 75%
+    );
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+  }
+
+  /* Custom Buttons */
+  .btn-primary {
+    @apply bg-navy-primary hover:bg-sky-hover text-white font-medium py-2.5 px-6 rounded-md transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-slate-50 border border-slate-200 text-navy-primary font-medium py-2.5 px-6 rounded-md transition-all duration-300 transform active:scale-95;
+  }
+
+  .btn-accent {
+    @apply bg-gold-accent hover:bg-amber-600 text-white font-medium py-2.5 px-6 rounded-md transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95;
+  }
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F7FA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1B3F6E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2E6DB4;
+}
+
+/* Premium float animation for Hero images */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-float {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.active-nav-link {
+  border-bottom: 2px solid #B8952A;
+  color: #1B3F6E !important;
+}
+
+/* Luxury styling additions */
+.shadow-luxury {
+  box-shadow: 0 10px 40px -10px rgba(15, 39, 68, 0.05), 0 1px 3px rgba(15, 39, 68, 0.01);
+  transition: box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-luxury-hover {
+  transition: box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-luxury-hover:hover {
+  box-shadow: 0 30px 60px -15px rgba(15, 39, 68, 0.1), 0 5px 20px -5px rgba(15, 39, 68, 0.05);
+  transform: translateY(-4px);
+}
+
+.glassmorphism-premium {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glassmorphism-dark-premium {
+  background: rgba(15, 39, 68, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom premium hover underline animation */
+.hover-underline-luxury {
+  position: relative;
+}
+.hover-underline-luxury::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #B8952A;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+.hover-underline-luxury:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Soft shimmer effect for luxury cards */
+.luxury-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.luxury-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.3) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.luxury-shimmer:hover::after {
+  transform: translateX(100%);
+}
+
+/* Keyframes for premium micro-interactions */
+@keyframes heart-beat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.18); }
+  50% { transform: scale(0.96); }
+  75% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart-beat {
+  animation: heart-beat 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Global button, link & input transitions (200ms to 300ms) */
+button, a, select, input, textarea {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+.active-scale-premium:active {
+  transform: scale(0.97);
+}
+
+/* Luxury Skeleton Loader Shimmer */
+.luxury-skeleton {
+  background: linear-gradient(90deg, #F8FAFC 25%, #E2E8F0 50%, #F8FAFC 75%);
+  background-size: 200% 100%;
+  animation: luxury-skeleton-shimmer 1.4s infinite ease-in-out;
+}
+@keyframes luxury-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-1rem) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Staggered page fade-in-up animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0; /* Keeps element hidden until animation starts */
+}
+
+/* Custom animation delays */
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+
+/* Opposed float slow animation for secondary floating items */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(8px) rotate(-0.5deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 4.5s ease-in-out infinite;
+}
+
+/* Premium Light Sheen / Shine sweep for buttons */
+.btn-shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine-sweep::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+.btn-shine-sweep:hover::after {
+  left: 125%;
+  transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Micro-interaction badge pop animation (e.g. for cart count badge) */
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Custom premium navbar hover underline animation */
+.hover-underline-navbar {
+  position: relative;
+}
+.hover-underline-navbar::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #B8952A;
+  transform-origin: bottom center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-underline-navbar:hover::after {
+  transform: scaleX(1);
+}
+
+/* Header Action icons scale pop and spring bounce */
+.hover-scale-bounce {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease !important;
+}
+.hover-scale-bounce:hover {
+  transform: scale(1.15) !important;
+}
+.hover-scale-bounce:active {
+  transform: scale(0.92) !important;
+}
+
+/* Sidebar lists and filter labels slide right transition */
+.hover-slide-right {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
+}
+.hover-slide-right:hover {
+  transform: translateX(4px) !important;
+  color: #1B3F6E !important;
+}
+
+/* Padding at the bottom on mobile & tablet to account for the fixed bottom navigation bar */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: 64px !important;
+  }
+}
+
+/* ============ Uiverse-inspired motion utilities ============ */
+
+/* Gold shimmer button (primary CTA replacement) */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+}
+.btn-shimmer:hover::after {
+  left: 125%;
+}
+
+/* Product card tilt + glow on hover */
+.card-glow {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  will-change: transform;
+}
+.card-glow:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -12px rgba(27, 63, 110, 0.25), 0 0 0 1px rgba(184, 149, 42, 0.15);
+}
+
+/* Skeleton shimmer loader (replace any plain gray placeholder) */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #EAF0F8 25%, #F5F7FA 37%, #EAF0F8 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Animated gold underline for nav links / headings */
+.underline-grow {
+  position: relative;
+}
+.underline-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background: #B8952A;
+  transition: width 0.3s ease;
+}
+.underline-grow:hover::after {
+  width: 100%;
+}
+
+/* Wishlist heart pop */
+@keyframes heart-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.heart-pop {
+  animation: heart-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-shimmer::after,
+  .card-glow,
+  .skeleton-shimmer,
+  .underline-grow::after,
+  .heart-pop {
+    animation: none !important;
+    transition: none !important;
+  }
+}
