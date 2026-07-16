@@ -35,7 +35,7 @@
       "destination": "https://api.eyeleads.com/"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
