@@ -1,0 +1,286 @@
+=== Git Execution Log ===
+
+[git init]
+stdout: Initialized empty Git repository in C:/Users/sujan/OneDrive/Desktop/eyeleads/eyelead/.git/
+
+stderr: 
+
+[git add .]
+stdout: 
+stderr: warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/.env.example', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/cleanup.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/cleanup_jpg.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/clearDb.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/config/db.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/git_helper.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/middleware/auditLogger.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/middleware/authMiddleware.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/middleware/crawlerPreview.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/middleware/uploadMiddleware.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/AuditLog.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Coupon.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Inquiry.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Newsletter.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Notification.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Order.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Prescription.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Product.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/ReturnRequest.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Review.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/Settings.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/models/User.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/registerAdmin.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/ai.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/auditLogs.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/auth.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/contact.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/coupons.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/newsletter.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/notifications.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/orders.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/prescriptions.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/products.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/returns.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/reviews.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/settings.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/routes/upload.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/server.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/services/shiprocketService.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/start_frontend.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test_lens_pricing.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/email.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/lensPricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/notifyNewOrder.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/sendEmail.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/sendWhatsApp.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/utils/shippingWeight.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/.env.example', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/.npmrc', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/audit_temp.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/eslint.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/postcss.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/public/icons.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/public/robots.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/public/site.webmanifest', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/public/sitemap.xml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/App.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/assets/vite.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/AdminRoute.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/AnnouncementBar.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/BackToTop.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/CouponManagementPanel.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/Footer.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/FrameFinder.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/Navbar.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/ProductCard.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/ProductCardList.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/ProtectedRoute.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/SEO.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/ScrollToTop.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/Toast.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/VirtualTryOn.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/WhatsAppButton.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/motion/Reveal.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/motion/StaggerGrid.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/context/AuthContext.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/context/CartContext.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/context/WishlistContext.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/hooks/useInViewAnimation.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/hooks/useReducedMotion.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/lib/utils.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/main.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/About.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Account.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Admin.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Cart.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Checkout.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Contact.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/FAQ.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/ForgotPassword.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Home.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Login.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/NotFound.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/OrderDetail.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/PrivacyPolicy.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/ProductDetail.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Register.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/ResetPassword.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/ShippingReturns.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Shop.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/TermsOfService.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/TrackOrder.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/Wishlist.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/utils/api.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/utils/coupons.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/utils/lensPricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/tailwind.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/vercel.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/vite.config.js', LF will be replaced by CRLF the next time Git touches it
+
+
+[git status]
+stdout: On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   .gitignore
+	new file:   backend/.env.example
+	new file:   backend/.gitignore
+	new file:   backend/cleanup.js
+	new file:   backend/cleanup_jpg.js
+	new file:   backend/clearDb.js
+	new file:   backend/config/db.js
+	new file:   backend/git_helper.js
+	new file:   backend/middleware/auditLogger.js
+	new file:   backend/middleware/authMiddleware.js
+	new file:   backend/middleware/crawlerPreview.js
+	new file:   backend/middleware/uploadMiddleware.js
+	new file:   backend/models/AuditLog.js
+	new file:   backend/models/Coupon.js
+	new file:   backend/models/Inquiry.js
+	new file:   backend/models/Newsletter.js
+	new file:   backend/models/Notification.js
+	new file:   backend/models/Order.js
+	new file:   backend/models/Prescription.js
+	new file:   backend/models/Product.js
+	new file:   backend/models/ReturnRequest.js
+	new file:   backend/models/Review.js
+	new file:   backend/models/Settings.js
+	new file:   backend/models/User.js
+	new file:   backend/otp.txt
+	new file:   backend/package-lock.json
+	new file:   backend/package.json
+	new file:   backend/registerAdmin.js
+	new file:   backend/routes/ai.js
+	new file:   backend/routes/auditLogs.js
+	new file:   backend/routes/auth.js
+	new file:   backend/routes/contact.js
+	new file:   backend/routes/coupons.js
+	new file:   backend/routes/newsletter.js
+	new file:   backend/routes/notifications.js
+	new file:   backend/routes/orders.js
+	new file:   backend/routes/prescriptions.js
+	new file:   backend/routes/products.js
+	new file:   backend/routes/returns.js
+	new file:   backend/routes/reviews.js
+	new file:   backend/routes/settings.js
+	new file:   backend/routes/upload.js
+	new file:   backend/server.js
+	new file:   backend/services/shiprocketService.js
+	new file:   backend/start_frontend.js
+	new file:   backend/test_lens_pricing.mjs
+	new file:   backend/utils/email.js
+	new file:   backend/utils/lensPricing.js
+	new file:   backend/utils/notifyNewOrder.js
+	new file:   backend/utils/sendEmail.js
+	new file:   backend/utils/sendWhatsApp.js
+	new file:   backend/utils/shippingWeight.js
+	new file:   frontend/.env.example
+	new file:   frontend/.gitignore
+	new file:   frontend/.npmrc
+	new file:   frontend/README.md
+	new file:   frontend/audit_temp.py
+	new file:   frontend/eslint.config.js
+	new file:   frontend/index.html
+	new file:   frontend/package-lock.json
+	new file:   frontend/package.json
+	new file:   frontend/postcss.config.js
+	new file:   frontend/public/android-chrome-192x192.png
+	new file:   frontend/public/android-chrome-512x512.png
+	new file:   frontend/public/apple-touch-icon.png
+	new file:   frontend/public/favicon-16x16.png
+	new file:   frontend/public/favicon-32x32.png
+	new file:   frontend/public/favicon-48x48.png
+	new file:   frontend/public/favicon.ico
+	new file:   frontend/public/icon-192.png
+	new file:   frontend/public/icon-512.png
+	new file:   frontend/public/icons.svg
+	new file:   frontend/public/robots.txt
+	new file:   frontend/public/site.webmanifest
+	new file:   frontend/public/sitemap.xml
+	new file:   frontend/src/App.css
+	new file:   frontend/src/App.jsx
+	new file:   frontend/src/assets/computer_glasses.png
+	new file:   frontend/src/assets/computer_glasses.webp
+	new file:   frontend/src/assets/hero.png
+	new file:   frontend/src/assets/kids_eyewear.png
+	new file:   frontend/src/assets/kids_eyewear.webp
+	new file:   frontend/src/assets/logo.jpg
+	new file:   frontend/src/assets/logo.png
+	new file:   frontend/src/assets/premium_sunglasses.png
+	new file:   frontend/src/assets/premium_sunglasses.webp
+	new file:   frontend/src/assets/prescription_glasses.png
+	new file:   frontend/src/assets/prescription_glasses.webp
+	new file:   frontend/src/assets/react.svg
+	new file:   frontend/src/assets/sports_sunglasses.png
+	new file:   frontend/src/assets/sports_sunglasses.webp
+	new file:   frontend/src/assets/vite.svg
+	new file:   frontend/src/components/AdminRoute.jsx
+	new file:   frontend/src/components/AnnouncementBar.jsx
+	new file:   frontend/src/components/BackToTop.jsx
+	new file:   frontend/src/components/CouponManagementPanel.jsx
+	new file:   frontend/src/components/Footer.jsx
+	new file:   frontend/src/components/FrameFinder.jsx
+	new file:   frontend/src/components/Navbar.jsx
+	new file:   frontend/src/components/ProductCard.jsx
+	new file:   frontend/src/components/ProductCardList.jsx
+	new file:   frontend/src/components/ProtectedRoute.jsx
+	new file:   frontend/src/components/SEO.jsx
+	new file:   frontend/src/components/ScrollToTop.jsx
+	new file:   frontend/src/components/Toast.jsx
+	new file:   frontend/src/components/VirtualTryOn.jsx
+	new file:   frontend/src/components/WhatsAppButton.jsx
+	new file:   frontend/src/components/motion/Reveal.jsx
+	new file:   frontend/src/components/motion/StaggerGrid.jsx
+	new file:   frontend/src/context/AuthContext.jsx
+	new file:   frontend/src/context/CartContext.jsx
+	new file:   frontend/src/context/WishlistContext.jsx
+	new file:   frontend/src/hooks/useInViewAnimation.js
+	new file:   frontend/src/hooks/useReducedMotion.js
+	new file:   frontend/src/index.css
+	new file:   frontend/src/lib/utils.js
+	new file:   frontend/src/main.jsx
+	new file:   frontend/src/pages/About.jsx
+	new file:   frontend/src/pages/Account.jsx
+	new file:   frontend/src/pages/Admin.jsx
+	new file:   frontend/src/pages/Cart.jsx
+	new file:   frontend/src/pages/Checkout.jsx
+	new file:   frontend/src/pages/Contact.jsx
+	new file:   frontend/src/pages/FAQ.jsx
+	new file:   frontend/src/pages/ForgotPassword.jsx
+	new file:   frontend/src/pages/Home.jsx
+	new file:   frontend/src/pages/Login.jsx
+	new file:   frontend/src/pages/NotFound.jsx
+	new file:   frontend/src/pages/OrderDetail.jsx
+	new file:   frontend/src/pages/PrivacyPolicy.jsx
+	new file:   frontend/src/pages/ProductDetail.jsx
+	new file:   frontend/src/pages/Register.jsx
+	new file:   frontend/src/pages/ResetPassword.jsx
+	new file:   frontend/src/pages/ShippingReturns.jsx
+	new file:   frontend/src/pages/Shop.jsx
+	new file:   frontend/src/pages/TermsOfService.jsx
+	new file:   frontend/src/pages/TrackOrder.jsx
+	new file:   frontend/src/pages/Wishlist.jsx
+	new file:   frontend/src/utils/api.js
+	new file:   frontend/src/utils/coupons.js
+	new file:   frontend/src/utils/lensPricing.js
+	new file:   frontend/tailwind.config.js
+	new file:   frontend/vercel.json
+	new file:   frontend/vite.config.js
+
+
+stderr: 
+

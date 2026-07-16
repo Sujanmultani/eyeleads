@@ -30,7 +30,7 @@ import prescriptionRoutes from './routes/prescriptions.js';
 import { crawlerPreviewMiddleware } from './middleware/crawlerPreview.js';
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
-// Comprehensive Startup Environment Validation Checks
+// Comprehensive Startup Environment Validation Checks - Trigger Git Push v2
 const REQUIRED_ENV = [
   'JWT_SECRET',
   'MONGODB_URI',
