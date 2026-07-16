@@ -704,76 +704,50 @@ const Home = () => {
       </section>
 
       {/* 6.5 WATCH & SHOP: EYELEADS TV (REELS) */}
-      <section className="py-20 bg-gradient-to-b from-[#F8FAFC] to-white overflow-hidden border-t border-slate-100 select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {videoProducts.length > 0 && (
+        <section className="py-20 bg-gradient-to-b from-[#F8FAFC] to-white overflow-hidden border-t border-slate-100 select-none">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
-            <div className="space-y-1">
-              <span className="text-[#B8952A] text-xs font-bold uppercase tracking-[0.3em] block">
-                EyeLeads TV
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1B3F6E] tracking-tight font-serif">
-                Watch & Shop: Luxury Reels
-              </h2>
-              <p className="text-[#4A4A6A] text-xs font-medium mt-1">
-                See our premium eyewear in motion. Tap to play full-screen and shop the look.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
+              <div className="space-y-1">
+                <span className="text-[#B8952A] text-xs font-bold uppercase tracking-[0.3em] block">
+                  EyeLeads TV
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1B3F6E] tracking-tight font-serif">
+                  Watch & Shop: Luxury Reels
+                </h2>
+                <p className="text-[#4A4A6A] text-xs font-medium mt-1">
+                  See our premium eyewear in motion. Tap to play full-screen and shop the look.
+                </p>
+              </div>
+
+              <div className="flex gap-2 mt-4 sm:mt-0">
+                <button
+                  onClick={() => scrollCarousel('left')}
+                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#B8952A] text-slate-600 hover:text-[#B8952A] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => scrollCarousel('right')}
+                  className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#B8952A] text-slate-600 hover:text-[#B8952A] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex gap-2 mt-4 sm:mt-0">
-              <button
-                onClick={() => scrollCarousel('left')}
-                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#B8952A] text-slate-600 hover:text-[#B8952A] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => scrollCarousel('right')}
-                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:border-[#B8952A] text-slate-600 hover:text-[#B8952A] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-95"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
+            <div
+              ref={carouselRef}
+              className="flex gap-6 overflow-x-auto pb-6 scrollbar-none snap-x snap-mandatory scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {videoProducts.map((product) => renderReelCard(product))}
             </div>
-          </div>
 
-          <div
-            ref={carouselRef}
-            className="flex gap-6 overflow-x-auto pb-6 scrollbar-none snap-x snap-mandatory scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {videoProducts.length > 0 ? (
-              videoProducts.map((product) => renderReelCard(product))
-            ) : (
-              // Simulated demo cards when no video products are uploaded yet
-              <>
-                {renderReelCard({
-                  _id: 'demo-1',
-                  name: 'Signature Navigator (Demo)',
-                  brand: 'EyeLeads Premium',
-                  price: 3499,
-                  image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&auto=format&fit=crop&q=80',
-                  videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-fashion-woman-with-glasses-profile-40280-large.mp4',
-                  videoThumbnail: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&auto=format&fit=crop&q=80',
-                  category: 'Sunglasses',
-                  isDemo: true
-                })}
-                {renderReelCard({
-                  _id: 'demo-2',
-                  name: 'Classic Zephyr Round (Demo)',
-                  brand: 'Titanium Series',
-                  price: 7499,
-                  image: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600&auto=format&fit=crop&q=80',
-                  videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-fashion-woman-with-glasses-profile-40280-large.mp4',
-                  videoThumbnail: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600&auto=format&fit=crop&q=80',
-                  category: 'Eyeglasses',
-                  isDemo: true
-                })}
-              </>
-            )}
           </div>
-
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 6. WHY EYELEADS */}
       <section className="py-20 bg-[#EAF0F8]">
