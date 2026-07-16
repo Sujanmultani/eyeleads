@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verifySession = async () => {
       try {
-        const { data } = await api.get('/auth/me');
+        const { data } = await api.get('/api/auth/me');
         if (data.success) {
           setUser(data.user);
         } else {
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const { data } = await api.post('/api/auth/login', { email, password });
 
       if (data.otpRequired) {
         // Admin account — don't set user yet, caller must call verifyOtp next.
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOtp = async (email, otp) => {
     try {
-      const { data } = await api.post('/auth/verify-otp', { email, otp });
+      const { data } = await api.post('/api/auth/verify-otp', { email, otp });
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         payload = { name: nameOrFormData, email, password };
       }
-      const { data } = await api.post('/auth/register', payload);
+      const { data } = await api.post('/api/auth/register', payload);
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/api/auth/logout');
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
