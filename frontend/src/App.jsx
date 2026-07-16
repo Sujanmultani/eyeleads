@@ -38,6 +38,7 @@ const TrackOrder = lazy(() => import('./pages/TrackOrder'));
 import WhatsAppButton from './components/WhatsAppButton';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import { baseURL } from './utils/api';
 function AppContent() {
   const { loading } = useAuth();
   const location = useLocation();
@@ -125,6 +126,95 @@ function AppContent() {
 }
 
 function App() {
+  const isProduction = import.meta.env.PROD;
+  const isLocalhostApi = baseURL.includes('localhost') || baseURL.includes('127.0.0.1');
+  const isLocalhostPage = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  if (isProduction && isLocalhostApi && !isLocalhostPage) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#0F172A',
+        color: '#F8FAFC',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        padding: '24px',
+        boxSizing: 'border-box',
+        zIndex: 999999
+      }}>
+        <div style={{
+          maxWidth: '540px',
+          width: '100%',
+          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          borderRadius: '24px',
+          padding: '40px 32px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(16px)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            color: '#EF4444'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{ width: '32px', height: '32px' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: 800,
+            marginBottom: '12px',
+            color: '#EF4444',
+            letterSpacing: '-0.025em',
+            textTransform: 'uppercase'
+          }}>Configuration Error</h1>
+          <p style={{
+            fontSize: '15px',
+            color: '#94A3B8',
+            lineHeight: '1.6',
+            marginBottom: '24px',
+            fontWeight: 500
+          }}>
+            The application is not connected to a live backend. <br />
+            Please configure the <code style={{ color: '#F8FAFC', backgroundColor: '#334155', padding: '2px 6px', borderRadius: '4px' }}>VITE_API_URL</code> environment variable in Vercel and redeploy.
+          </p>
+          <div style={{
+            fontSize: '13px',
+            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+            padding: '16px',
+            borderRadius: '12px',
+            fontFamily: 'monospace',
+            color: '#94A3B8',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            textAlign: 'left',
+            wordBreak: 'break-all',
+            lineHeight: '1.5'
+          }}>
+            <span style={{ color: '#F43F5E', fontWeight: 'bold' }}>[Diagnostic Information]</span><br />
+            <span style={{ color: '#E2E8F0' }}>API URL:</span> {baseURL}<br />
+            <span style={{ color: '#E2E8F0' }}>Hostname:</span> {typeof window !== 'undefined' ? window.location.hostname : 'unknown'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <AuthProvider>
