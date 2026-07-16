@@ -53,7 +53,7 @@ const Footer = () => {
             {/* Social Icons row */}
             <div className="flex gap-4">
               <a
-                href="https://www.instagram.com/eye.leads?igsh=ZW9yeHY5NHJjN2t1"
+                href="https://www.instagram.com/eye.leadscare?igsh=NHY5MDcxdWU4cWJi"
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full bg-[#1B3F6E] flex items-center justify-center text-slate-300 hover:bg-[#B8952A] hover:text-white transition-all transform hover:scale-110 cursor-pointer"
@@ -66,7 +66,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/share/19MPxVeKWL/"
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full bg-[#1B3F6E] flex items-center justify-center text-slate-300 hover:bg-[#B8952A] hover:text-white transition-all transform hover:scale-110 cursor-pointer"
@@ -77,7 +77,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@eye.leadscare"
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full bg-[#1B3F6E] flex items-center justify-center text-slate-300 hover:bg-[#B8952A] hover:text-white transition-all transform hover:scale-110 cursor-pointer"
