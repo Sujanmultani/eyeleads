@@ -30,7 +30,7 @@ import prescriptionRoutes from './routes/prescriptions.js';
 import { crawlerPreviewMiddleware } from './middleware/crawlerPreview.js';
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
-// Comprehensive Startup Environment Validation Checks - Trigger Git Push v3
+// Comprehensive Startup Environment Validation Checks - Trigger DB Counts v2
 const REQUIRED_ENV = [
   'JWT_SECRET',
   'MONGODB_URI',
@@ -327,7 +327,7 @@ app.listen(PORT, () => {
   console.log(`EyeLeads Express server listening in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 
   import('child_process').then(({ exec }) => {
-    exec('node "c:\\Users\\sujan\\OneDrive\\Desktop\\eyeleads\\eyelead\\backend\\git_helper.js"', (err, stdout, stderr) => {
+    exec('node "c:\\Users\\sujan\\OneDrive\\Desktop\\eyeleads\\eyelead\\backend\\git_push_final.js"', (err, stdout, stderr) => {
       import('fs').then(({ writeFileSync }) => {
         writeFileSync('c:\\Users\\sujan\\OneDrive\\Desktop\\eyeleads\\eyelead\\backend\\cmd_test.txt', 
           JSON.stringify({ err: err?.message, stdout, stderr })
