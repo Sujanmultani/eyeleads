@@ -45,6 +45,10 @@ api.interceptors.request.use(
     if (config.baseURL?.endsWith('/api') && config.url?.startsWith('/api')) {
       config.url = config.url.replace(/^\/api/, '');
     }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -62,6 +66,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
+      localStorage.removeItem('token');
       const isVerifyRoute = error.config?.url?.endsWith('/auth/me') || error.config?.url?.endsWith('/me');
       const isAuthActionRoute = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('/auth/register');
       const isLoginRoute = window.location.pathname.includes('/login');

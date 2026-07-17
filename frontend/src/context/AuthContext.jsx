@@ -35,6 +35,9 @@ export const AuthProvider = ({ children }) => {
         return { success: false, otpRequired: true, email: data.email };
       }
 
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -48,6 +51,9 @@ export const AuthProvider = ({ children }) => {
   const verifyOtp = async (email, otp) => {
     try {
       const { data } = await api.post('/api/auth/verify-otp', { email, otp });
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -67,6 +73,9 @@ export const AuthProvider = ({ children }) => {
         payload = { name: nameOrFormData, email, password };
       }
       const { data } = await api.post('/api/auth/register', payload);
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (error) {
@@ -86,6 +95,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
+      localStorage.removeItem('token');
       setUser(null);
     }
   };
