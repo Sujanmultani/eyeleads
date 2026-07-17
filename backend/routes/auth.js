@@ -15,7 +15,7 @@ const router = express.Router();
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: parseInt(process.env.COOKIE_EXPIRES_IN || '7') * 24 * 60 * 60 * 1000,
   path: '/'
 };
@@ -423,7 +423,7 @@ router.post('/logout', (req, res) => {
     httpOnly: true,
     expires: new Date(0),
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/'
   });
   res.status(200).json({ success: true, message: 'Logged out successfully.' });

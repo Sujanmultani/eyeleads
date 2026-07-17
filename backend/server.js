@@ -179,6 +179,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.PROD_CLIENT_URL,
   process.env.FRONTEND_URL || 'http://localhost:5173',
+  'https://eyeleads.vercel.app',
   'http://localhost:3000'
 ].filter(Boolean);
 
@@ -325,14 +326,4 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`EyeLeads Express server listening in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-
-  import('child_process').then(({ exec }) => {
-    exec('node "c:\\Users\\sujan\\OneDrive\\Desktop\\eyeleads\\eyelead\\backend\\git_push_final.js"', (err, stdout, stderr) => {
-      import('fs').then(({ writeFileSync }) => {
-        writeFileSync('c:\\Users\\sujan\\OneDrive\\Desktop\\eyeleads\\eyelead\\backend\\cmd_test.txt', 
-          JSON.stringify({ err: err?.message, stdout, stderr })
-        );
-      });
-    });
-  });
 });
