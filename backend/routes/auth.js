@@ -12,6 +12,19 @@ import { logActivity } from '../middleware/auditLogger.js';
 
 const router = express.Router();
 
+const mockModeActive = () => process.env.DB_CONNECTED !== "true" && process.env.NODE_ENV !== 'production';
+
+// Fail fast in production if the database is disconnected
+router.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && process.env.DB_CONNECTED !== "true") {
+    return res.status(503).json({
+      success: false,
+      message: 'Service temporarily unavailable. Please try again shortly.'
+    });
+  }
+  next();
+});
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -107,7 +120,7 @@ router.post('/register', authLimiter, registerValidation, async (req, res, next)
 
   try {
     // Graceful fallback when database is not connected
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const userExists = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (userExists) {
         return res.status(400).json({ success: false, message: 'User already exists in Mock Mode' });
@@ -197,9 +210,9 @@ router.post('/login', authLimiter, loginValidation, async (req, res, next) => {
 
   try {
     // Graceful fallback when database is not connected
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const MOCK_PASSWORDS = {
-        'syst@elcadmin.sup': 'ELC/gap93572tap{close&@pp$€\\<my@£#^_\\at;w074',
+        'syst@elcadmin.sup': process.env.MOCK_ADMIN_PASSWORD || 'ELC/gap93572tap{close&@pp$€\\<my@£#^_\\at;w074',
         'demo@eyeleads.com': 'Demo@123',
         'optician@eyeleads.com': 'Optician@123'
       };
@@ -335,7 +348,7 @@ router.post('/verify-otp', otpLimiter, async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Email and OTP are required.' });
     }
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const mockUser = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       const pendingOtp = MOCK_OTP_STORE[email.toLowerCase()];
 
@@ -434,7 +447,7 @@ router.post('/logout', (req, res) => {
 // @access  Private
 router.get('/me', protect, async (req, res, next) => {
   try {
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const user = MOCK_USERS.find(u => u._id === req.user?._id) || req.user;
       return res.status(200).json({
         success: true,
@@ -469,7 +482,7 @@ router.get('/me', protect, async (req, res, next) => {
 // @access  Private/Admin
 router.get('/users', protect, adminOnly, async (req, res, next) => {
   try {
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       return res.json({
         status: 'success',
         count: MOCK_USERS.length,
@@ -496,7 +509,7 @@ router.put('/users/:id/role', protect, adminOnly, async (req, res, next) => {
     const { isAdmin } = req.body;
     let targetEmail = '';
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const user = MOCK_USERS.find(u => u._id === req.params.id);
       if (!user) {
         res.status(404);
@@ -565,7 +578,7 @@ router.put('/users/:id/suspend', protect, adminOnly, async (req, res, next) => {
     const { isSuspended } = req.body;
     let targetEmail = '';
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const user = MOCK_USERS.find(u => u._id === req.params.id);
       if (!user) {
         res.status(404);
@@ -631,7 +644,7 @@ router.delete('/users/:id', protect, adminOnly, async (req, res, next) => {
   try {
     let targetEmail = '';
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const userIdx = MOCK_USERS.findIndex(u => u._id === req.params.id);
       if (userIdx === -1) {
         res.status(404);
@@ -688,7 +701,7 @@ router.post('/forgot-password', async (req, res, next) => {
   try {
     const { email } = req.body;
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       console.log(`[Forgot Password Mock] Requested reset link for: ${email}`);
       return res.json({ message: 'If that email exists, a reset link has been sent.' });
     }
@@ -763,7 +776,7 @@ router.post('/reset-password', async (req, res, next) => {
   try {
     const { token, email, newPassword } = req.body;
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       console.log(`[Reset Password Mock] Resetting credentials for: ${email}`);
       const mockUser = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (mockUser) {
@@ -803,7 +816,7 @@ router.put('/profile', protect, async (req, res, next) => {
   try {
     const { savedAddress, name } = req.body;
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const mockUser = MOCK_USERS.find(u => u._id === req.user?._id) || req.user;
       if (!mockUser) {
         res.status(404);
@@ -861,7 +874,7 @@ router.put('/change-password', protect, async (req, res, next) => {
       throw new Error('New password must be at least 8 characters.');
     }
 
-    if (process.env.DB_CONNECTED !== 'true') {
+    if (mockModeActive()) {
       const mockUser = MOCK_USERS.find(u => u._id === req.user?._id);
       if (!mockUser || mockUser.password !== currentPassword) {
         res.status(401);
