@@ -10,4 +10,4 @@ Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /orders/
 
-Sitemap: https://YOUR-DOMAIN.com/sitemap.xml
+Sitemap: https://eyeleadscare.com/sitemap.xml
