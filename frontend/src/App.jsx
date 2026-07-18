@@ -78,9 +78,25 @@ function AppContent() {
         {/* Main content viewport */}
         <main ref={mainRef} className="flex-grow">
           <Suspense fallback={
-            <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#F8FAFC] gap-3 text-slate-400 select-none">
-              <Loader className="h-10 w-10 animate-spin text-[#B8952A]" />
-              <p className="text-[11px] font-black uppercase tracking-wider text-[#1B3F6E]">Loading content...</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-10 min-h-[60vh] w-full animate-fadeIn select-none">
+              {/* Generic Hero/Banner block */}
+              <div className="w-full h-48 sm:h-64 rounded-3xl skeleton-shimmer"></div>
+              
+              {/* Generic Grid of 3-4 placeholder cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4 shadow-[0_8px_30px_rgba(0,0,0,0.01)]">
+                    {/* Card Image placeholder */}
+                    <div className="aspect-[4/5] bg-slate-50 skeleton-shimmer rounded-xl"></div>
+                    {/* Card text line 1 */}
+                    <div className="h-3.5 bg-slate-50 skeleton-shimmer rounded w-1/3"></div>
+                    {/* Card text line 2 */}
+                    <div className="h-4.5 bg-slate-50 skeleton-shimmer rounded w-3/4"></div>
+                    {/* Card text line 3 */}
+                    <div className="h-3.5 bg-slate-50 skeleton-shimmer rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
             </div>
           }>
             <Routes>
