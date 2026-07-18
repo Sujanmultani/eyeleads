@@ -427,11 +427,11 @@ const Home = () => {
             {/* Luxury Serif Heading & Description */}
             <div className="space-y-6">
               <h1 className="text-5xl sm:text-6xl lg:text-[76px] font-light text-white leading-[1.05] tracking-tight hero-headline" style={{ fontFamily: '"Playfair Display", Georgia, "Times New Roman", serif' }}>
-                Sculpted for <br />
-                <span className="font-serif italic font-light text-[#B8952A] select-all">Singular Visions.</span>
+                Lead the Way <br />
+                <span className="font-serif italic font-light text-[#B8952A] select-all">You See.</span>
               </h1>
               <p className="text-slate-300 font-medium text-sm sm:text-base leading-relaxed max-w-lg hero-subtext">
-                Experience an uncompromising blend of experimental high-fashion aesthetics and precision medical-grade optical engineering. Hand-finished acetate and pure Japanese titanium.
+                Discover a curated collection of premium eyewear where bold design meets exceptional craftsmanship and precision optics. From iconic statement frames to everyday essentials, every piece is selected to elevate your vision and define your style.
               </p>
             </div>
 
