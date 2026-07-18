@@ -416,70 +416,94 @@ const Admin = () => {
     setLoading(true);
     setError('');
     try {
+      const results = await Promise.allSettled([
+        api.get('/api/products'),           // 0
+        api.get('/api/orders'),             // 1
+        api.get('/api/auth/users'),         // 2
+        api.get('/api/audit-logs'),         // 3
+        api.get('/api/settings'),           // 4
+        api.get('/api/reviews/admin/all'),  // 5
+        api.get('/api/contact/admin/all'),  // 6
+        api.get('/api/notifications'),      // 7
+        api.get('/api/returns'),            // 8
+        api.get('/api/prescriptions')       // 9
+      ]);
+
+      // Check for critical request failures (indices 0 to 4)
+      const criticalFailures = results.slice(0, 5).filter(r => r.status === 'rejected');
+      if (criticalFailures.length > 0) {
+        throw criticalFailures[0].reason;
+      }
+
       // 1. Fetch Products
-      const productsRes = await api.get('/api/products');
+      const productsRes = results[0].value;
       setProducts(productsRes.data.products || productsRes.data || []);
 
       // 2. Fetch Orders
-      const ordersRes = await api.get('/api/orders');
+      const ordersRes = results[1].value;
       setOrders(ordersRes.data.orders || ordersRes.data || []);
 
       // 3. Fetch Users
-      const usersRes = await api.get('/api/auth/users');
+      const usersRes = results[2].value;
       setUsers(usersRes.data.users || usersRes.data || []);
 
       // 4. Fetch Audit Logs
-      const logsRes = await api.get('/api/audit-logs');
+      const logsRes = results[3].value;
       setAuditLogs(logsRes.data.logs || logsRes.data || []);
 
       // 5. Fetch Store Settings
-      const settingsRes = await api.get('/api/settings');
+      const settingsRes = results[4].value;
       if (settingsRes.data && settingsRes.data.settings) {
         setStoreSettings(settingsRes.data.settings);
       }
 
       // 6. Fetch Reviews
-      try {
-        const reviewsRes = await api.get('/api/reviews/admin/all');
+      const reviewsResult = results[5];
+      if (reviewsResult.status === 'fulfilled') {
+        const reviewsRes = reviewsResult.value;
         setReviews(reviewsRes.data.reviews || reviewsRes.data || []);
-      } catch (revErr) {
-        console.warn('Admin reviews load error:', revErr);
+      } else {
+        console.warn('Admin reviews load error:', reviewsResult.reason);
         setReviews([]);
       }
 
       // 7. Fetch Stylist Inquiries
-      try {
-        const inquiriesRes = await api.get('/api/contact/admin/all');
+      const inquiriesResult = results[6];
+      if (inquiriesResult.status === 'fulfilled') {
+        const inquiriesRes = inquiriesResult.value;
         setInquiries(inquiriesRes.data.inquiries || inquiriesRes.data || []);
-      } catch (inqErr) {
-        console.warn('Admin inquiries load error:', inqErr);
+      } else {
+        console.warn('Admin inquiries load error:', inquiriesResult.reason);
         setInquiries([]);
       }
 
       // 8. Fetch Admin In-App Notifications
-      try {
-        const notifRes = await api.get('/api/notifications');
+      const notificationsResult = results[7];
+      if (notificationsResult.status === 'fulfilled') {
+        const notifRes = notificationsResult.value;
         setNotifications(notifRes.data.notifications || []);
         setUnreadCount(notifRes.data.unreadCount || 0);
-      } catch (notifErr) {
-        console.warn('Admin notifications load error:', notifErr);
+      } else {
+        console.warn('Admin notifications load error:', notificationsResult.reason);
       }
 
       // 9. Fetch Return Requests
-      try {
-        const returnsRes = await api.get('/api/returns');
+      const returnsResult = results[8];
+      if (returnsResult.status === 'fulfilled') {
+        const returnsRes = returnsResult.value;
         setReturnRequests(returnsRes.data || []);
-      } catch (retErr) {
-        console.warn('Admin returns load error:', retErr);
+      } else {
+        console.warn('Admin returns load error:', returnsResult.reason);
         setReturnRequests([]);
       }
 
       // 10. Fetch Prescription Review Queue
-      try {
-        const rxListRes = await api.get('/api/prescriptions');
+      const prescriptionsResult = results[9];
+      if (prescriptionsResult.status === 'fulfilled') {
+        const rxListRes = prescriptionsResult.value;
         setAllPrescriptions(rxListRes.data?.prescriptions || []);
-      } catch (rxListErr) {
-        console.warn('Admin prescriptions load error:', rxListErr);
+      } else {
+        console.warn('Admin prescriptions load error:', prescriptionsResult.reason);
         setAllPrescriptions([]);
       }
     } catch (err) {
