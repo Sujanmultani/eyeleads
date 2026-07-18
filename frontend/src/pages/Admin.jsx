@@ -1525,9 +1525,95 @@ const Admin = () => {
       {/* Primary Workspace Panel */}
       <main className="flex-grow p-6 sm:p-10 z-10 overflow-y-auto max-h-screen">
         {loading ? (
-          <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 text-slate-400">
-            <Loader className="h-8 w-8 animate-spin text-gold-accent" />
-            <p className="text-xs font-bold uppercase tracking-widest">Compiling EyeLeads Databases...</p>
+          <div className="space-y-8 animate-fadeIn">
+            {/* Header Skeleton */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/60 pb-6">
+              <div className="space-y-2">
+                {/* Storefront Intelligence badge */}
+                <div className="h-3 w-32 skeleton-shimmer rounded"></div>
+                {/* Active tab Manager heading */}
+                <div className="h-8 w-48 skeleton-shimmer rounded-lg"></div>
+              </div>
+              <div className="flex items-center gap-3.5">
+                {/* Notification Bell placeholder */}
+                <div className="h-10 w-10 skeleton-shimmer rounded-xl"></div>
+                {/* Refresh Data button placeholder */}
+                <div className="h-10 w-28 skeleton-shimmer rounded-xl"></div>
+              </div>
+            </div>
+
+            {/* Stats Cards Skeleton (4 cards) */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex items-center justify-between">
+                  <div className="space-y-3 w-2/3">
+                    {/* Stat Label */}
+                    <div className="h-3 w-16 skeleton-shimmer rounded"></div>
+                    {/* Stat Value */}
+                    <div className="h-6 w-24 skeleton-shimmer rounded-md"></div>
+                  </div>
+                  {/* Stat Icon container */}
+                  <div className="h-12 w-12 rounded-2xl skeleton-shimmer shrink-0"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Subsections Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Column: Recent Purchases (7 columns) */}
+              <div className="lg:col-span-7 bg-white p-8 rounded-[32px] border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  {/* Title */}
+                  <div className="h-4 w-32 skeleton-shimmer rounded"></div>
+                  {/* View All */}
+                  <div className="h-3 w-16 skeleton-shimmer rounded"></div>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="py-4.5 flex items-center justify-between first:pt-0 last:pb-0">
+                      <div className="space-y-2 w-1/2">
+                        {/* Order ID */}
+                        <div className="h-3 w-20 skeleton-shimmer rounded"></div>
+                        {/* Order Items */}
+                        <div className="h-4 w-full skeleton-shimmer rounded"></div>
+                      </div>
+                      <div className="text-right space-y-2 flex flex-col items-end">
+                        {/* Price */}
+                        <div className="h-4 w-16 skeleton-shimmer rounded"></div>
+                        {/* Status badge */}
+                        <div className="h-4 w-12 skeleton-shimmer rounded-full"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Security Alerts (5 columns) */}
+              <div className="lg:col-span-5 bg-white p-8 rounded-[32px] border border-slate-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-6">
+                <div className="border-b border-slate-100 pb-4">
+                  {/* Title */}
+                  <div className="h-4 w-28 skeleton-shimmer rounded"></div>
+                </div>
+
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex gap-3.5 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      {/* Icon */}
+                      <div className="h-8 w-8 rounded-xl skeleton-shimmer shrink-0"></div>
+                      <div className="space-y-2 flex-grow">
+                        {/* Alert title */}
+                        <div className="h-3 w-1/2 skeleton-shimmer rounded"></div>
+                        {/* Alert description line 1 */}
+                        <div className="h-2.5 w-full skeleton-shimmer rounded"></div>
+                        {/* Alert description line 2 */}
+                        <div className="h-2.5 w-3/4 skeleton-shimmer rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-8 animate-fadeIn">
