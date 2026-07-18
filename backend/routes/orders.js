@@ -1011,9 +1011,9 @@ router.put('/:id/manual-shipping', protect, adminOnly, async (req, res, next) =>
 });
 
 // @desc    Receive Shiprocket webhook status updates (domestic orders only)
-// @route   POST /api/orders/webhooks/shiprocket
+// @route   POST /api/orders/webhooks/courier-status
 // @access  Public (verified via shared secret header)
-router.post('/webhooks/shiprocket', async (req, res) => {
+router.post('/webhooks/courier-status', async (req, res) => {
   // Shiprocket's docs require the webhook URL to ALWAYS respond with 200,
   // regardless of outcome — otherwise Shiprocket may flag the endpoint as
   // unreliable and stop delivering events. All error handling below logs
