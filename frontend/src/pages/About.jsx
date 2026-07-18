@@ -5,18 +5,29 @@ import SEO from '../components/SEO';
 const About = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fadeIn space-y-16">
-      <SEO title="About Us" description="Learn about EyeLeads — our story, our commitment to quality eyewear, and why customers trust us for prescription glasses and sunglasses." />
+      <SEO title="About Us" description="Learn about LEADS CARE — our story, our commitment to quality eyewear, and how we make expert vision care accessible across India." />
       {/* Brand Hero Story */}
-      <section className="text-center max-w-3xl mx-auto space-y-4">
+      <section className="text-center max-w-4xl mx-auto space-y-6">
         <span className="text-gold-accent font-bold text-xs uppercase tracking-widest bg-tint px-3.5 py-1 rounded-full">
           Our Vision
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-text-primary tracking-tight leading-tight">
-          EyeLeads — Defining The Future Of Vision
+          LEADS CARE — Redefining Vision Care in India
         </h1>
-        <p className="text-base text-text-muted leading-relaxed">
-          Founded in 2026, EyeLeads was born out of a simple mission: to make premium, high-quality prescription glasses, sunglasses, and functional eyewear accessible, customizable, and stylish for everyone.
-        </p>
+        <div className="text-base text-text-muted leading-relaxed space-y-4 max-w-3xl mx-auto text-left sm:text-center">
+          <p>
+            <strong>LEADS CARE</strong>, founded in 2026 with a simple yet ambitious vision: to redefine how India experiences eyewear by making premium, expertly curated vision care accessible to everyone.
+          </p>
+          <p>
+            We believe that better vision begins with the right guidance—not just the right frame. By combining carefully selected premium eyewear, precision optics, and access to qualified in-house opticians and optometrists through a seamless digital platform, we aim to empower people to make informed decisions about their eye health from anywhere in India.
+          </p>
+          <p>
+            Our vision is to bridge the gap between quality eyewear and professional eye care through technology, education, and personalized support. We strive to raise awareness about the importance of clear vision, simplify the eyewear-buying journey, and deliver an effortless experience—from consultation to product delivery.
+          </p>
+          <p>
+            At LEADS CARE, we envision a future where every individual, regardless of location, has access to trusted vision expertise, world-class eyewear, and a seamless digital experience that helps them see better, live better, and experience life with greater clarity.
+          </p>
+        </div>
       </section>
 
       {/* Brand Core Values */}
