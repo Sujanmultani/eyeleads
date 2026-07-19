@@ -69,52 +69,7 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-const seedAccessories = async () => {
-  try {
-    const kitId = '6a3c5d6e7f8a9b0c1d2e3f4b';
-    const existing = await Product.findById(kitId);
-    if (!existing) {
-      await Product.create({
-        _id: kitId,
-        name: 'Eco-Friendly Lens Cleaning Kit',
-        brand: 'EyeLeads Premium',
-        category: 'Computer Glasses',
-        frameShape: 'Accessory',
-        material: 'Liquid & Cloth',
-        gender: 'Unisex',
-        colors: ['Clear'],
-        price: 299,
-        mrp: 299,
-        discount: 0,
-        rating: 4.8,
-        reviews: 15,
-        image: `${BACKEND_URL}/uploads/lens-cleaning-kit.png`,
-        prescriptionAvailable: false,
-        inStockOnly: true,
-        onSale: false,
-        warranty: 'No Warranty',
-        isCleaningKit: true
-      });
-      console.log('Seeded Eco-Friendly Lens Cleaning Kit successfully.');
-    } else {
-      let updated = false;
-      if (existing.image !== `${BACKEND_URL}/uploads/lens-cleaning-kit.png`) {
-        existing.image = `${BACKEND_URL}/uploads/lens-cleaning-kit.png`;
-        updated = true;
-      }
-      if (!existing.isCleaningKit) {
-        existing.isCleaningKit = true;
-        updated = true;
-      }
-      if (updated) {
-        await existing.save();
-        console.log('Updated Eco-Friendly Lens Cleaning Kit metadata successfully.');
-      }
-    }
-  } catch (err) {
-    console.error('Error seeding accessories:', err.message);
-  }
-};
+
 
 const seedAdminUser = async () => {
   try {
@@ -146,7 +101,6 @@ const seedAdminUser = async () => {
 connectDB().then(async () => {
   // FIXED: Admin store settings lost on every server restart (no persistence)
   await loadSettingsFromDB();
-  await seedAccessories();
   await seedAdminUser();
 });
 

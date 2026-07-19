@@ -86,36 +86,6 @@ export const MOCK_PRODUCTS = [
     videoThumbnail: "best eyewear",
     productId: "EL-CG26-SXJC"
   },
-  {
-    _id: "6a3c5d6e7f8a9b0c1d2e3f4b",
-    name: "Eco-Friendly Lens Cleaning Kit",
-    brand: "EyeLeads Premium",
-    category: "Computer Glasses",
-    frameShape: "Accessory",
-    material: "Liquid & Cloth",
-    gender: "Unisex",
-    colors: ["Clear"],
-    price: 299,
-    mrp: 299,
-    discount: 0,
-    rating: 4.8,
-    reviews: 15,
-    badges: [],
-    image: `${BACKEND_URL}/uploads/lens-cleaning-kit.png`,
-    images: [],
-    tryOnAssets: {
-      frontPng: "",
-      anglePng: "",
-      frameWidthMm: 138
-    },
-    prescriptionAvailable: false,
-    inStockOnly: true,
-    onSale: false,
-    warranty: "No Warranty",
-    videoUrl: "",
-    videoThumbnail: "",
-    productId: "EL-CG26-F44E"
-  }
 ];
 
 // @desc    Get all products with advanced filtering and pagination

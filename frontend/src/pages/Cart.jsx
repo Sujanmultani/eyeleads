@@ -178,18 +178,7 @@ const Cart = () => {
         badges: ['Bestseller'],
         tryOnAssets: { frameWidthMm: 138 }
       },
-      {
-        _id: 'prod-fallback-2',
-        name: 'Digital Shield Pro',
-        price: 2299,
-        mrp: 3499,
-        discount: 34,
-        image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=600&auto=format&fit=crop&q=80',
-        brand: 'EyeLeads Shield',
-        category: 'Computer Glasses',
-        colors: ['White', 'Blue'],
-        badges: []
-      },
+
       {
         _id: 'prod-fallback-3',
         name: 'Navigator Classic',
