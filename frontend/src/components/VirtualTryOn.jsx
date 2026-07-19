@@ -35,22 +35,14 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     const startCamera = async () => {
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
-      const deviceRatio = window.innerWidth / window.innerHeight;
 
-      // Try a chain of constraint sets, from "match device exactly" down to
-      // a safe generic fallback — some front cameras reject exact/ideal
-      // portrait aspect ratios outright rather than just approximating them.
+      // IMPORTANT: never pass a strict/ideal `aspectRatio` here. Many front
+      // cameras honor it by cropping the sensor itself (a hard digital zoom)
+      // instead of just picking the closest native mode — that's what was
+      // causing the "zoomed into one eye" bug. We only ask for a resolution
+      // and let object-cover (CSS) handle filling the screen instead.
       const constraintAttempts = isMobile
         ? [
-            {
-              video: {
-                facingMode: 'user',
-                width: { ideal: window.innerWidth },
-                height: { ideal: window.innerHeight },
-                aspectRatio: { ideal: deviceRatio }
-              },
-              audio: false
-            },
             {
               video: {
                 facingMode: 'user',
@@ -63,7 +55,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           ]
         : [
             {
-              video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 }, aspectRatio: { ideal: 16 / 9 } },
+              video: {
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+              },
               audio: false
             },
             { video: { facingMode: 'user' }, audio: false }
