@@ -1167,7 +1167,7 @@ const ProductDetail = () => {
                 <ShieldCheck className="h-4.5 w-4.5" />
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest block leading-none">Guarantee</span>
+                <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest block leading-none">Warranty</span>
                 <span className="text-xs font-black text-[#1B3F6E] block mt-1 leading-tight">{product.warranty || storeSettings?.warrantyText || '1-Year Warranty'}</span>
               </div>
             </div>
