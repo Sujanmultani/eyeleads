@@ -164,88 +164,35 @@ const Cart = () => {
 
   // Cart Recommendations list dynamically loaded from shop (excluding cart items, accessories, and placeholder cards)
   const cartRecommendations = useMemo(() => {
-    const fallbacks = [
-      {
-        _id: 'prod-fallback-1',
-        name: 'Zephyr Acetate Round',
-        price: 2999,
-        mrp: 3999,
-        discount: 25,
-        image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&auto=format&fit=crop&q=80',
-        brand: 'EyeLeads Premium',
-        category: 'Sunglasses',
-        colors: ['Black'],
-        badges: ['Bestseller'],
-        tryOnAssets: { frameWidthMm: 138 }
-      },
+    if (allProducts.length === 0) return [];
 
-      {
-        _id: 'prod-fallback-3',
-        name: 'Navigator Classic',
-        price: 3499,
-        mrp: 4999,
-        discount: 30,
-        image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&auto=format&fit=crop&q=80',
-        brand: 'EyeLeads Premium',
-        category: 'Sunglasses',
-        colors: ['Gold', 'Black'],
-        badges: ['New Arrival'],
-        tryOnAssets: { frameWidthMm: 140 }
-      },
-      {
-        _id: 'prod-fallback-4',
-        name: 'Downtown Acetate Eyeglasses',
-        price: 4199,
-        mrp: 5999,
-        discount: 30,
-        image: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=600&auto=format&fit=crop&q=80',
-        brand: 'EyeLeads Premium',
-        category: 'Eyeglasses',
-        colors: ['Black'],
-        badges: ['Bestseller'],
-        tryOnAssets: { frameWidthMm: 135 }
-      }
-    ];
+    const cartProductIds = new Set(
+      cartItems.map((item) => item.product?._id || item.product?.id || item.product)
+    );
 
-    let list = [];
-    if (allProducts.length > 0) {
-      const cartProductIds = new Set(
-        cartItems.map((item) => item.product?._id || item.product?.id || item.product)
-      );
-      const filtered = allProducts.filter((p) => {
-        // Exclude items already in cart
-        if (cartProductIds.has(p._id)) return false;
+    const filtered = allProducts.filter((p) => {
+      // Exclude items already in cart
+      if (cartProductIds.has(p._id)) return false;
 
-        // Exclude test products like 'xxx' or 'test'
-        const nameLower = (p.name || '').toLowerCase();
-        if (nameLower === 'xxx' || nameLower.includes('test')) return false;
+      // Exclude test products like 'xxx' or 'test'
+      const nameLower = (p.name || '').toLowerCase();
+      if (nameLower === 'xxx' || nameLower.includes('test')) return false;
 
-        // Exclude accessories/cleaning kits/cloths
-        if (nameLower.includes('cleaning') || nameLower.includes('kit') || nameLower.includes('cloth')) return false;
+      // Exclude accessories/cleaning kits/cloths
+      if (nameLower.includes('cleaning') || nameLower.includes('kit') || nameLower.includes('cloth')) return false;
 
-        // Ensure category is eyeglasses or sunglasses or computer glasses (excluding accessories)
-        const categoryLower = (p.category || '').toLowerCase();
-        if (categoryLower.includes('accessory') || categoryLower.includes('kit') || categoryLower.includes('cleaning')) return false;
+      // Ensure category is eyeglasses or sunglasses or computer glasses (excluding accessories)
+      const categoryLower = (p.category || '').toLowerCase();
+      if (categoryLower.includes('accessory') || categoryLower.includes('kit') || categoryLower.includes('cleaning')) return false;
 
-        // Filter out black & white or card/lens placeholder images
-        const imgUrl = (p.image || '').toLowerCase();
-        if (imgUrl.includes('lens-cleaning-kit') || imgUrl.includes('ldgzcp7iiplhamngur9s')) return false;
+      // Filter out black & white or card/lens placeholder images
+      const imgUrl = (p.image || '').toLowerCase();
+      if (imgUrl.includes('lens-cleaning-kit') || imgUrl.includes('ldgzcp7iiplhamngur9s')) return false;
 
-        return true;
-      });
+      return true;
+    });
 
-      list = [...filtered];
-    }
-
-    // If we have fewer than 4 products from the database, fill the remaining spots with fallbacks
-    if (list.length < 4) {
-      const needed = 4 - list.length;
-      const existingNames = new Set(list.map((p) => p.name.toLowerCase()));
-      const availableFallbacks = fallbacks.filter((f) => !existingNames.has(f.name.toLowerCase()));
-      list = [...list, ...availableFallbacks.slice(0, needed)];
-    }
-
-    return list.slice(0, 4);
+    return filtered.slice(0, 4);
   }, [allProducts, cartItems]);
 
   return (
