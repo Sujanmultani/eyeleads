@@ -3827,11 +3827,11 @@ const Admin = () => {
                   onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
                   className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
                 >
-                  <option value="EyeLeads Premium">EyeLeads Premium</option>
                   <option value="EyeLeads Classic">EyeLeads Classic</option>
-                  <option value="EyeLeads Shield">EyeLeads Shield</option>
-                  <option value="EyeLeads Active">EyeLeads Active</option>
-                  <option value="EyeLeads Elite">EyeLeads Elite</option>
+                  <option value="EyeLeads Bold">EyeLeads Bold</option>
+                  <option value="EyeLeads Flexx">EyeLeads Flexx</option>
+                  <option value="EyeLeads Apex">EyeLeads Apex</option>
+                  <option value="EyeLeads Craft">EyeLeads Craft</option>
                 </select>
               </div>
 

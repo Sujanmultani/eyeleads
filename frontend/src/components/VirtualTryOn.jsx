@@ -451,7 +451,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-6 overflow-hidden select-none animate-fadeIn"
+      className="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center overflow-hidden select-none animate-fadeIn"
     >
       {/* Upper Navigation Bar */}
       <div className="absolute top-0 inset-x-0 bg-gradient-to-b from-black/60 to-transparent p-4 flex justify-between items-center z-30">
@@ -468,8 +468,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         </button>
       </div>
 
-      {/* Main Viewport Container */}
-      <div className="relative w-full max-w-3xl mx-auto aspect-video sm:rounded-3xl border border-white/10 overflow-hidden bg-slate-900 shadow-2xl flex items-center justify-center">
+      {/* Main Viewport Container — full screen on mobile, card on md+ */}
+      <div className="relative w-full h-full md:h-auto md:max-w-3xl md:mx-auto md:aspect-video md:rounded-3xl md:border md:border-white/10 overflow-hidden bg-slate-900 md:shadow-2xl flex items-center justify-center flex-1">
         {/* Loading Spinner */}
         {loading && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-slate-950/90 text-slate-400 p-6">
@@ -530,18 +530,44 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             <span>Please move into the camera frame</span>
           </div>
         )}
+
+        {/* Bottom controls overlay — mobile only (pinned inside camera area) */}
+        {!cameraError && (
+          <div className="absolute bottom-0 inset-x-0 md:hidden z-30 flex flex-col items-center gap-3 pb-6 pt-8 bg-gradient-to-t from-black/70 to-transparent">
+            <div className="flex items-center gap-6 justify-center">
+              <div className="flex items-center gap-1.5 text-[9px] text-slate-300 font-extrabold uppercase tracking-wider">
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                <span>Camera Mirrored</span>
+              </div>
+              <div className="h-3 w-px bg-slate-600" />
+              <div className="flex items-center gap-1.5 text-[9px] text-slate-300 font-extrabold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                <span>GPU Accelerated</span>
+              </div>
+            </div>
+            <button
+              onClick={handleCapture}
+              disabled={loading}
+              className="w-16 h-16 rounded-full bg-white hover:bg-[#B8952A] border-4 border-slate-950 flex items-center justify-center cursor-pointer shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_35px_rgba(184,149,42,0.45)] text-slate-950 hover:text-white transition-all transform active:scale-90 duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+              title="Capture Try-On Photo"
+            >
+              <Camera className="h-7 w-7 group-hover:scale-110 transition-transform" />
+            </button>
+            <span className="text-slate-300 text-[10px] font-extrabold uppercase tracking-wider">Tap to take a picture</span>
+          </div>
+        )}
       </div>
 
-      {/* Lower Control Bar */}
+      {/* Lower Control Bar — tablet/desktop only (below the camera card) */}
       {!cameraError && (
-        <div className="w-full max-w-md mt-6 flex flex-col items-center gap-4 z-30">
+        <div className="hidden md:flex w-full max-w-md mt-6 flex-col items-center gap-4 z-30">
           <div className="flex items-center gap-6 justify-center">
             {/* Mirror Indicator */}
             <div className="flex items-center gap-1.5 text-[9px] text-slate-500 font-extrabold uppercase tracking-wider">
               <Check className="h-3.5 w-3.5 text-emerald-500" />
               <span>Camera Mirrored</span>
             </div>
-            
+
             <div className="h-3 w-px bg-slate-800"></div>
 
             {/* Performance status */}
