@@ -34,31 +34,64 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
   useEffect(() => {
     const startCamera = async () => {
       setLoadingStatus('Accessing camera stream...');
-      try {
-        // Detect if mobile/portrait to pick best camera resolution
-        const isMobile = window.innerWidth <= 768;
-        const constraints = {
-          video: {
-            facingMode: 'user',
-            width: isMobile ? { ideal: window.innerWidth } : { ideal: 1280 },
-            height: isMobile ? { ideal: window.innerHeight } : { ideal: 720 },
-            aspectRatio: isMobile
-              ? { ideal: window.innerWidth / window.innerHeight }
-              : { ideal: 16 / 9 }
-          },
-          audio: false
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+      const isMobile = window.innerWidth <= 768;
+      const deviceRatio = window.innerWidth / window.innerHeight;
+
+      // Try a chain of constraint sets, from "match device exactly" down to
+      // a safe generic fallback — some front cameras reject exact/ideal
+      // portrait aspect ratios outright rather than just approximating them.
+      const constraintAttempts = isMobile
+        ? [
+            {
+              video: {
+                facingMode: 'user',
+                width: { ideal: window.innerWidth },
+                height: { ideal: window.innerHeight },
+                aspectRatio: { ideal: deviceRatio }
+              },
+              audio: false
+            },
+            {
+              video: {
+                facingMode: 'user',
+                width: { ideal: 720 },
+                height: { ideal: 1280 }
+              },
+              audio: false
+            },
+            { video: { facingMode: 'user' }, audio: false }
+          ]
+        : [
+            {
+              video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 }, aspectRatio: { ideal: 16 / 9 } },
+              audio: false
+            },
+            { video: { facingMode: 'user' }, audio: false }
+          ];
+
+      let stream = null;
+      let lastErr = null;
+      for (const constraints of constraintAttempts) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          break;
+        } catch (err) {
+          lastErr = err;
         }
-      } catch (err) {
-        console.error('Camera access error:', err);
+      }
+
+      if (!stream) {
+        console.error('Camera access error:', lastErr);
         setCameraError(
           'Camera access is required for Virtual Try-On. Please check your browser permissions and ensure no other application is using your webcam.'
         );
         setLoading(false);
+        return;
+      }
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
     };
 
@@ -75,29 +108,74 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     };
   }, []);
 
+  // Re-fit on orientation change / window resize (mobile browsers fire
+  // 'resize' on rotation; some also need 'orientationchange' as a fallback)
+  useEffect(() => {
+    const handleResize = () => {
+      // Canvas internal resolution is already re-synced every frame in the
+      // render loop from video.videoWidth/videoHeight, so we don't need to
+      // restart the camera stream here — this just forces a layout repaint
+      // so object-cover recalculates against the new viewport immediately
+      // instead of waiting for the next paint tick.
+      if (canvasRef.current) {
+        canvasRef.current.style.display = 'none';
+        // eslint-disable-next-line no-unused-expressions
+        canvasRef.current.offsetHeight;
+        canvasRef.current.style.display = '';
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
+
   // 2. Pre-load transparent PNG assets
   useEffect(() => {
-    let loadedCount = 0;
-    const checkAllLoaded = () => {
-      loadedCount++;
-      if (loadedCount === 2) {
+    imagesLoaded.current = false;
+    let frontOk = false;
+    let angleOk = false;
+
+    const maybeUnblock = () => {
+      // Front PNG is mandatory. Angle PNG is optional — if it fails, we
+      // silently reuse the front image instead of blocking the whole feature.
+      if (frontOk) {
         imagesLoaded.current = true;
       }
     };
 
     const frontImg = new Image();
     frontImg.crossOrigin = 'anonymous';
-    frontImg.onload = checkAllLoaded;
-    frontImg.onerror = () => console.error('Failed to load front try-on PNG');
+    frontImg.onload = () => { frontOk = true; maybeUnblock(); };
+    frontImg.onerror = () => {
+      console.error('Failed to load front try-on PNG:', frontPng);
+      frontOk = false;
+      imagesLoaded.current = false;
+      setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
+      toast.error('Try-On assets failed to load.');
+    };
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
     const angleImg = new Image();
     angleImg.crossOrigin = 'anonymous';
-    angleImg.onload = checkAllLoaded;
-    angleImg.onerror = () => console.error('Failed to load angle try-on PNG');
-    angleImg.src = anglePng || frontPng; // fallback to front if angle is not supplied
-    angleImgRef.current = angleImg;
+    angleImg.onload = () => { angleOk = true; maybeUnblock(); };
+    angleImg.onerror = () => {
+      console.error('Failed to load angle try-on PNG, falling back to front PNG:', anglePng);
+      // Fall back to the already-loading front image so the 3/4 angle
+      // blend simply reuses the front shot instead of breaking try-on.
+      angleImgRef.current = frontImgRef.current;
+      angleOk = true;
+      maybeUnblock();
+    };
+    angleImg.src = anglePng || frontPng;
+    if (anglePng) {
+      angleImgRef.current = angleImg;
+    } else {
+      angleOk = true;
+    }
   }, [frontPng, anglePng]);
 
   // 3. Initialize MediaPipe FaceLandmarker
@@ -508,13 +586,13 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           autoPlay
           playsInline
           muted
-          className="absolute inset-0 w-full h-full object-contain opacity-0 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none"
         />
 
-        {/* Composited AR Overlay Canvas (Displays mirrored video + glasses, no crop/zoom) */}
+        {/* Composited AR Overlay Canvas (Displays mirrored video + glasses, full-bleed no letterbox) */}
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
           style={{ background: '#0f172a' }}
         />
 
