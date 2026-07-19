@@ -35,11 +35,16 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     const startCamera = async () => {
       setLoadingStatus('Accessing camera stream...');
       try {
+        // Detect if mobile/portrait to pick best camera resolution
+        const isMobile = window.innerWidth <= 768;
         const constraints = {
           video: {
             facingMode: 'user',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: isMobile ? { ideal: window.innerWidth } : { ideal: 1280 },
+            height: isMobile ? { ideal: window.innerHeight } : { ideal: 720 },
+            aspectRatio: isMobile
+              ? { ideal: window.innerWidth / window.innerHeight }
+              : { ideal: 16 / 9 }
           },
           audio: false
         };
@@ -503,13 +508,14 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           autoPlay
           playsInline
           muted
-          className="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-contain opacity-0 pointer-events-none"
         />
 
-        {/* Composited AR Overlay Canvas (Displays mirrored video + glasses) */}
+        {/* Composited AR Overlay Canvas (Displays mirrored video + glasses, no crop/zoom) */}
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
+          style={{ background: '#0f172a' }}
         />
 
         {/* Alignment Helper Target Oval */}
