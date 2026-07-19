@@ -36,23 +36,14 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
 
-      // IMPORTANT: never pass a strict/ideal `aspectRatio` here. Many front
-      // cameras honor it by cropping the sensor itself (a hard digital zoom)
-      // instead of just picking the closest native mode — that's what was
-      // causing the "zoomed into one eye" bug. We only ask for a resolution
-      // and let object-cover (CSS) handle filling the screen instead.
+      // Do not hint width/height together on mobile — even without an
+      // explicit aspectRatio key, an ideal width+height pair implies one,
+      // and phone sensors that can't natively match it get cropped tighter
+      // (hardware zoom) to satisfy the hint. facingMode alone is enough;
+      // the sensor returns its natural mode and CSS object-cover fills the
+      // screen from that, with no cropping at the hardware level.
       const constraintAttempts = isMobile
-        ? [
-            {
-              video: {
-                facingMode: 'user',
-                width: { ideal: 720 },
-                height: { ideal: 1280 }
-              },
-              audio: false
-            },
-            { video: { facingMode: 'user' }, audio: false }
-          ]
+        ? [{ video: { facingMode: 'user' }, audio: false }]
         : [
             {
               video: {
