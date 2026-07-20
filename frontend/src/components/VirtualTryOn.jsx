@@ -37,20 +37,23 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
 
-      // Do not hint width/height together on mobile — even without an
-      // explicit aspectRatio key, an ideal width+height pair implies one,
-      // and phone sensors that can't natively match it get cropped tighter
-      // (hardware zoom) to satisfy the hint. facingMode alone is enough;
-      // the sensor returns its natural mode and CSS object-cover fills the
-      // screen from that, with no cropping at the hardware level.
+      // Safe to request higher quality now — the render loop does its own
+      // software cover-crop sized to the screen, so whatever resolution the
+      // camera actually returns gets cropped correctly regardless. These are
+      // just `ideal` hints (soft preferences), not `exact`, so devices that
+      // can't hit them simply return their closest native mode instead of
+      // erroring or force-cropping.
       const constraintAttempts = isMobile
-        ? [{ video: { facingMode: 'user' }, audio: false }]
+        ? [
+            { video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+            { video: { facingMode: 'user' }, audio: false }
+          ]
         : [
             {
               video: {
                 facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
               },
               audio: false
             },
@@ -136,7 +139,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
     const frontImg = new Image();
     frontImg.crossOrigin = 'anonymous';
-    frontImg.onload = () => { frontOk = true; maybeUnblock(); };
+    frontImg.onload = () => {
+      frontOk = true;
+      console.log('[TryOn Debug] Front PNG loaded OK:', frontPng, frontImg.width, 'x', frontImg.height);
+      maybeUnblock();
+    };
     frontImg.onerror = () => {
       console.error('Failed to load front try-on PNG:', frontPng);
       frontOk = false;
@@ -413,6 +420,19 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             smoothed.current = { x1: null, y1: null, x2: null, y2: null, noseY: null, yaw: null, pitch: null };
           }
         }
+
+        // --- Temporary diagnostic logging (remove once glasses render confirmed) ---
+        if (!renderLoop._lastDebugLog || Date.now() - renderLoop._lastDebugLog > 1000) {
+          renderLoop._lastDebugLog = Date.now();
+          console.log('[TryOn Debug]', {
+            shouldDraw,
+            imagesLoaded: imagesLoaded.current,
+            hasFrontImg: !!frontImgRef.current,
+            smoothedX1: smoothed.current.x1,
+            faceDetectedThisFrame: !!(results && results.faceLandmarks && results.faceLandmarks.length > 0)
+          });
+        }
+        // ---------------------------------------------------------------------------
 
         // Draw overlaid assets using smoothed values if images are fully loaded
         if (shouldDraw && imagesLoaded.current && frontImgRef.current && smoothed.current.x1 !== null) {
