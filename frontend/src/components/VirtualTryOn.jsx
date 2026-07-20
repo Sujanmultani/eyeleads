@@ -37,26 +37,27 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
 
-      // Safe to request higher quality now — the render loop does its own
-      // software cover-crop sized to the screen, so whatever resolution the
-      // camera actually returns gets cropped correctly regardless. These are
-      // just `ideal` hints (soft preferences), not `exact`, so devices that
-      // can't hit them simply return their closest native mode instead of
-      // erroring or force-cropping.
+      // Use { exact: 'user' } in the first attempt to FORCE the front
+      // camera — the plain string 'user' is a soft preference that many
+      // Android browsers silently ignore, falling back to the rear camera.
+      // If the device has no front camera the exact constraint throws and
+      // we fall through to the soft-preference fallback attempt.
       const constraintAttempts = isMobile
         ? [
-            { video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+            { video: { facingMode: { exact: 'user' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+            { video: { facingMode: { exact: 'user' } }, audio: false },
             { video: { facingMode: 'user' }, audio: false }
           ]
         : [
             {
               video: {
-                facingMode: 'user',
+                facingMode: { exact: 'user' },
                 width: { ideal: 1920 },
                 height: { ideal: 1080 }
               },
               audio: false
             },
+            { video: { facingMode: { exact: 'user' } }, audio: false },
             { video: { facingMode: 'user' }, audio: false }
           ];
 
