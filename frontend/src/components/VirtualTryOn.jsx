@@ -272,10 +272,20 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         const ctx = canvas.getContext('2d');
         const landmarker = landmarkerRef.current;
 
-        // Match canvas sizes to video stream aspect ratio dynamically
-        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+        // Size the canvas buffer to match what's actually on screen (the
+        // container), NOT the camera's raw native resolution. This is the
+        // key fix: we do the "cover" crop ourselves below instead of
+        // leaving it to CSS object-fit, which was cropping a landscape
+        // native camera feed into a portrait screen and causing severe
+        // zoom (only a tiny centered sliver of the frame was visible).
+        const container = containerRef.current;
+        const dpr = window.devicePixelRatio || 1;
+        const displayW = container ? Math.round(container.clientWidth * dpr) : video.videoWidth;
+        const displayH = container ? Math.round(container.clientHeight * dpr) : video.videoHeight;
+
+        if (canvas.width !== displayW || canvas.height !== displayH) {
+          canvas.width = displayW;
+          canvas.height = displayH;
         }
 
         // Clear canvas for this frame
@@ -286,8 +296,32 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         ctx.scale(-1, 1);
         ctx.translate(-canvas.width, 0);
 
-        // 1. Draw the mirrored video frame onto the canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Software "cover" crop: figure out the largest centered region of
+        // the raw video frame whose aspect ratio matches the screen, so we
+        // only ever crop as much as the actual screen shape requires —
+        // never more, regardless of the camera's native resolution/aspect.
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const vAspect = vw / vh;
+        const cAspect = canvas.width / canvas.height;
+
+        let sx, sy, sWidth, sHeight;
+        if (vAspect > cAspect) {
+          // Video is proportionally wider than the screen — crop left/right
+          sHeight = vh;
+          sWidth = vh * cAspect;
+          sx = (vw - sWidth) / 2;
+          sy = 0;
+        } else {
+          // Video is proportionally taller than the screen — crop top/bottom
+          sWidth = vw;
+          sHeight = vw / cAspect;
+          sx = 0;
+          sy = (vh - sHeight) / 2;
+        }
+
+        // 1. Draw the mirrored, cover-cropped video frame onto the canvas
+        ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
         // Run face detection on the current video frame
         const nowInMs = performance.now();
@@ -336,14 +370,20 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const leftAnchor = landmarks[234];
           const rightAnchor = landmarks[454];
 
-          // Convert normalized coords to actual canvas pixel coords
-          const x1 = leftAnchor.x * canvas.width;
-          const y1 = leftAnchor.y * canvas.height;
-          const x2 = rightAnchor.x * canvas.width;
-          const y2 = rightAnchor.y * canvas.height;
+          // Convert normalized coords (0..1 against the RAW video frame)
+          // into canvas pixel coords — must account for the cover-crop
+          // above (sx, sy, sWidth, sHeight), since the canvas no longer
+          // shows the full raw video 1:1 like it used to.
+          const mapX = (normX) => ((normX * vw) - sx) * (canvas.width / sWidth);
+          const mapY = (normY) => ((normY * vh) - sy) * (canvas.height / sHeight);
+
+          const x1 = mapX(leftAnchor.x);
+          const y1 = mapY(leftAnchor.y);
+          const x2 = mapX(rightAnchor.x);
+          const y2 = mapY(rightAnchor.y);
 
           // Vertical position of the nose bridge (Landmark 168)
-          const noseY = landmarks[168].y * canvas.height;
+          const noseY = mapY(landmarks[168].y);
 
           // Apply EMA smoothing to every raw tracked value
           smooth('x1', x1);
@@ -576,10 +616,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           className="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none"
         />
 
-        {/* Composited AR Overlay Canvas (Displays mirrored video + glasses, full-bleed no letterbox) */}
+        {/* Composited AR Overlay Canvas — buffer already matches container
+            exactly via JS cover-crop above, so no CSS object-fit needed */}
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full block"
           style={{ background: '#0f172a' }}
         />
 
