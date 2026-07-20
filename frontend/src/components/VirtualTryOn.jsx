@@ -11,7 +11,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
   const streamRef = useRef(null);
   const requestRef = useRef(null);
   const landmarkerRef = useRef(null);
-  
+
   // Exponential Moving Average (EMA) smoothing for face tracking coordinates
   const smoothed = useRef({ x1: null, y1: null, x2: null, y2: null, noseY: null, yaw: null, pitch: null });
   const SMOOTHING = 0.25; // lower = smoother/laggy, higher = snappier/jittery
@@ -44,22 +44,22 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       // we fall through to the soft-preference fallback attempt.
       const constraintAttempts = isMobile
         ? [
-            { video: { facingMode: { exact: 'user' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
-            { video: { facingMode: { exact: 'user' } }, audio: false },
-            { video: { facingMode: 'user' }, audio: false }
-          ]
+          { video: { facingMode: { exact: 'user' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+          { video: { facingMode: { exact: 'user' } }, audio: false },
+          { video: { facingMode: 'user' }, audio: false }
+        ]
         : [
-            {
-              video: {
-                facingMode: { exact: 'user' },
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
-              },
-              audio: false
+          {
+            video: {
+              facingMode: { exact: 'user' },
+              width: { ideal: 1920 },
+              height: { ideal: 1080 }
             },
-            { video: { facingMode: { exact: 'user' } }, audio: false },
-            { video: { facingMode: 'user' }, audio: false }
-          ];
+            audio: false
+          },
+          { video: { facingMode: { exact: 'user' } }, audio: false },
+          { video: { facingMode: 'user' }, audio: false }
+        ];
 
       let stream = null;
       let lastErr = null;
@@ -182,7 +182,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         const filesetResolver = await FilesetResolver.forVisionTasks(
           'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.8/wasm'
         );
-        
+
         const landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
           baseOptions: {
             modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
@@ -252,12 +252,12 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       ctx.save();
       ctx.translate(hingeX, hingeY);
       ctx.rotate(angle);
-      
+
       if (flipX) {
         ctx.translate(distance, 0);
         ctx.scale(-1, 1);
       }
-      
+
       // Scale and stretch the temple slice so its width matches `distance`
       // and its height matches `targetHeight` (proportionate to the center piece)
       ctx.drawImage(
@@ -312,6 +312,18 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         // never more, regardless of the camera's native resolution/aspect.
         const vw = video.videoWidth;
         const vh = video.videoHeight;
+
+        // Guard: if video or canvas dimensions are zero (can happen on the
+        // first few frames even after readyState >= 3, or if the portal
+        // container hasn't painted yet), skip this frame entirely.
+        // Without this, vw/vh = 0 → NaN in mapX/mapY → permanently
+        // corrupts the EMA smoothed coords so glasses never appear.
+        if (!vw || !vh || !canvas.width || !canvas.height) {
+          ctx.restore();
+          requestRef.current = requestAnimationFrame(renderLoop);
+          return;
+        }
+
         const vAspect = vw / vh;
         const cAspect = canvas.width / canvas.height;
 
@@ -344,7 +356,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           lastFaceTime.current = Date.now();
 
           const landmarks = results.faceLandmarks[0];
-          
+
           // Get facial transformation matrix for 3D pose extraction
           let yawDeg = 0;
           let pitchDeg = 0;
@@ -364,11 +376,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             const leftOuter = landmarks[33];
             const rightOuter = landmarks[263];
             const noseBridge = landmarks[168];
-            
+
             const dx = rightOuter.x - leftOuter.x;
             const dy = rightOuter.y - leftOuter.y;
             rollDeg = Math.atan2(dy, dx) * (180 / Math.PI);
-            
+
             // Yaw approximation based on nose shift relative to eye centers
             const leftDist = noseBridge.x - leftOuter.x;
             const rightDist = rightOuter.x - noseBridge.x;
@@ -408,7 +420,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         } else {
           setFaceDetected(false);
           const timeSinceLastFace = Date.now() - lastFaceTime.current;
-          
+
           if (timeSinceLastFace > 2000) {
             setNoFaceTimer(Math.floor(timeSinceLastFace / 1000));
           }
@@ -460,7 +472,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           // Tuned to 1.22 to compensate for transparent asset padding and provide an organic, premium fit.
           const GLASSES_FIT_RATIO = 1.22;
           const targetWidthPx = smoothedWidth * GLASSES_FIT_RATIO * (frameWidthMm / 138);
-          
+
           const frontImg = frontImgRef.current;
           const angleImg = angleImgRef.current;
 
@@ -530,7 +542,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             const angleW = angleImg.width || W;
             const angleH = angleImg.height || H;
             const aspect = angleW / angleH;
-            
+
             const renderW = targetWidthPx;
             const renderH = (renderW / aspect) * verticalScale;
 
