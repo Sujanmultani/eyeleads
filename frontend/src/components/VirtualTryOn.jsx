@@ -272,13 +272,14 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         const ctx = canvas.getContext('2d');
         const landmarker = landmarkerRef.current;
 
-        // Size the canvas buffer to match what's actually on screen (the
-        // container), NOT the camera's raw native resolution. This is the
-        // key fix: we do the "cover" crop ourselves below instead of
-        // leaving it to CSS object-fit, which was cropping a landscape
-        // native camera feed into a portrait screen and causing severe
-        // zoom (only a tiny centered sliver of the frame was visible).
-        const container = containerRef.current;
+        // Use the canvas's own direct parent for sizing — NOT containerRef,
+        // which points to the outer full-viewport backdrop div. On desktop
+        // the canvas is actually displayed inside a smaller centered
+        // md:aspect-video card, not the full viewport; measuring the wrong
+        // element caused the canvas buffer to be sized for the full
+        // viewport while it was visually constrained to the smaller card,
+        // producing an oversized/cropped result on desktop.
+        const container = canvas.parentElement;
         const dpr = window.devicePixelRatio || 1;
         const displayW = container ? Math.round(container.clientWidth * dpr) : video.videoWidth;
         const displayH = container ? Math.round(container.clientHeight * dpr) : video.videoHeight;
