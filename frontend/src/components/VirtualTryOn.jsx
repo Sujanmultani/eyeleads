@@ -453,8 +453,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           ctx.rotate(smoothedTilt);
           ctx.beginPath();
           ctx.ellipse(0, 0, targetWidthPx * 0.44, 7 * S, 0, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-          ctx.filter = 'blur(6px)';
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
           ctx.fill();
           ctx.restore();
 
