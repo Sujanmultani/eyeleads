@@ -319,27 +319,29 @@ const ProductDetail = () => {
     return base + upsellCost;
   };
 
-  // Fetch product data from API
+  // Fetch product data from API in parallel (zero network waterfalls for instant page loading)
   const fetchProductDetails = async () => {
     setLoading(true);
+    setError('');
 
-    // Fetch dynamic store configurations first
     try {
-      const settingsRes = await api.get('/api/settings');
-      if (settingsRes.data && settingsRes.data.settings) {
-        setStoreSettings(settingsRes.data.settings);
+      const [productRes, settingsRes, reviewsRes] = await Promise.allSettled([
+        api.get(`/api/products/${id}`),
+        api.get('/api/settings'),
+        api.get(`/api/reviews/${id}`)
+      ]);
+
+      // 1. Process Store Settings
+      if (settingsRes.status === 'fulfilled' && settingsRes.value.data?.settings) {
+        setStoreSettings(settingsRes.value.data.settings);
       }
-    } catch (settingsErr) {
-      console.warn('Could not load dynamic storefront configs. Using local default pricing.');
-    }
 
-    try {
-      const response = await api.get(`/api/products/${id}`);
-      if (response.data && response.data.status === 'success') {
-        const fetchedProduct = response.data.product;
+      // 2. Process Product Details (Mandatory)
+      if (productRes.status === 'fulfilled' && productRes.value.data?.status === 'success') {
+        const fetchedProduct = productRes.value.data.product;
         setProduct(fetchedProduct);
-        setRelatedProducts(response.data.related || []);
-        // Generate alternative multi-angle images using product's actual images array if present
+        setRelatedProducts(productRes.value.data.related || []);
+
         const alternateImages = Array.isArray(fetchedProduct.images) && fetchedProduct.images.length > 0
           ? fetchedProduct.images
           : [
@@ -354,19 +356,15 @@ const ProductDetail = () => {
           setSelectedColor(fetchedProduct.colors[0]);
         }
 
-        // Fetch reviews
-        try {
-          const reviewsRes = await api.get(`/api/reviews/${id}`);
-          if (reviewsRes.data && reviewsRes.data.status === 'success') {
-            const dbReviews = reviewsRes.data.reviews || [];
-            setReviewsList(dbReviews.length > 0 ? dbReviews : getFallbackReviews(fetchedProduct));
-          } else {
-            setReviewsList(getFallbackReviews(fetchedProduct));
-          }
-        } catch (revErr) {
-          console.warn('API error fetching reviews:', revErr);
+        // 3. Process Reviews
+        if (reviewsRes.status === 'fulfilled' && reviewsRes.value.data?.status === 'success') {
+          const dbReviews = reviewsRes.value.data.reviews || [];
+          setReviewsList(dbReviews.length > 0 ? dbReviews : getFallbackReviews(fetchedProduct));
+        } else {
           setReviewsList(getFallbackReviews(fetchedProduct));
         }
+      } else {
+        setError('The requested premium eyewear model could not be loaded. Please check your network or server connection.');
       }
     } catch (err) {
       console.error('API error fetching product details:', err);
