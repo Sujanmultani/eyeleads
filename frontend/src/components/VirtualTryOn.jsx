@@ -127,51 +127,28 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
   useEffect(() => {
     if (!frontPng) return;
     imagesLoaded.current = false;
-    let frontOk = false;
-    let angleOk = false;
-
-    const maybeUnblock = () => {
-      if (frontOk) {
-        imagesLoaded.current = true;
-      }
-    };
 
     const frontImg = new Image();
-    // Do NOT force crossOrigin='anonymous' for canvas visual rendering — omitting it
-    // guarantees 100% reliable loading across all mobile browsers & CDNs without CORS blocks.
     frontImg.onload = () => {
-      frontOk = true;
-      maybeUnblock();
+      imagesLoaded.current = true;
     };
     frontImg.onerror = (err) => {
       console.error('Failed to load front try-on PNG:', frontPng, err);
-      // Fallback: if image has natural dimensions despite error event, still allow rendering
-      if (frontImg.naturalWidth > 0) {
-        frontOk = true;
-        maybeUnblock();
-      }
     };
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
-    if (frontImg.complete || frontImg.naturalWidth > 0) {
-      frontOk = true;
-      maybeUnblock();
+    if (frontImg.naturalWidth > 0) {
+      imagesLoaded.current = true;
     }
 
     const angleImg = new Image();
-    angleImg.onload = () => { angleOk = true; maybeUnblock(); };
+    angleImg.onload = () => {};
     angleImg.onerror = () => {
       angleImgRef.current = frontImgRef.current;
-      angleOk = true;
-      maybeUnblock();
     };
     angleImg.src = anglePng || frontPng;
-    if (anglePng) {
-      angleImgRef.current = angleImg;
-    } else {
-      angleOk = true;
-    }
+    angleImgRef.current = angleImg;
   }, [frontPng, anglePng]);
 
   // 3. Initialize MediaPipe FaceLandmarker
@@ -444,11 +421,10 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
 
 
-        // Draw overlaid assets using smoothed values if face is tracked and front image exists
+        // Draw overlaid assets using smoothed values once face is tracked & image is decoded in memory
         const frontImg = frontImgRef.current;
-        const isFrontReady = frontImg && (frontImg.naturalWidth > 0 || frontImg.width > 0 || frontImg.complete);
 
-        if (shouldDraw && (imagesLoaded.current || isFrontReady) && frontImg && smoothed.current.x1 !== null) {
+        if (shouldDraw && frontImg && frontImg.naturalWidth > 0 && smoothed.current.x1 !== null) {
           const earLx = smoothed.current.x1;
           const earLy = smoothed.current.y1;
           const earRx = smoothed.current.x2;
