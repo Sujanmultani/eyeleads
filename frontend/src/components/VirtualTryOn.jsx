@@ -420,8 +420,15 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const smoothedYaw = smoothed.current.yaw;
           const smoothedPitch = smoothed.current.pitch;
 
-          const smoothedWidth = Math.hypot(earLx - earRx, earLy - earRy);
-          const smoothedTilt = Math.atan2(earLy - earRy, earLx - earRx);
+          let dx = earRx - earLx;
+          let dy = earRy - earLy;
+          if (dx < 0) {
+            dx = -dx;
+            dy = -dy;
+          }
+
+          const smoothedWidth = Math.hypot(dx, dy);
+          const smoothedTilt = Math.atan2(dy, dx);
           const midX = (earLx + earRx) / 2;
           const midY = (earLy + earRy) / 2;
 
