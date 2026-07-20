@@ -1,39 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/product/:id",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|twitterbot|whatsapp|linkedinbot|slackbot|telegrambot|discordbot|googlebot|bingbot|applebot).*"
-        }
-      ],
-      "destination": "https://api.eyeleads.com/product/:id"
-    },
-    {
-      "source": "/shop",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|twitterbot|whatsapp|linkedinbot|slackbot|telegrambot|discordbot|googlebot|bingbot|applebot).*"
-        }
-      ],
-      "destination": "https://api.eyeleads.com/shop"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|twitterbot|whatsapp|linkedinbot|slackbot|telegrambot|discordbot|googlebot|bingbot|applebot).*"
-        }
-      ],
-      "destination": "https://api.eyeleads.com/"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
