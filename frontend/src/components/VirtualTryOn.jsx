@@ -137,12 +137,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       }
     };
 
-    const corsSafeUrl = (url) => {
-      if (!url) return '';
-      if (url.startsWith('data:')) return url;
-      return `${url}${url.includes('?') ? '&' : '?'}cors=1`;
-    };
-
     const frontImg = new Image();
     frontImg.crossOrigin = 'anonymous';
     frontImg.onload = () => {
@@ -151,12 +145,18 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     };
     frontImg.onerror = () => {
       console.error('Failed to load front try-on PNG:', frontPng);
-      frontOk = false;
-      imagesLoaded.current = false;
-      setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
-      toast.error('Try-On assets failed to load.');
+      // Fallback: if image loaded natural dimensions despite CORS warning, still allow rendering
+      if (frontImg.naturalWidth > 0) {
+        frontOk = true;
+        maybeUnblock();
+      } else {
+        frontOk = false;
+        imagesLoaded.current = false;
+        setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
+        toast.error('Try-On assets failed to load.');
+      }
     };
-    frontImg.src = corsSafeUrl(frontPng);
+    frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
     if (frontImg.complete && frontImg.naturalWidth > 0) {
@@ -453,8 +453,9 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
 
 
-        // Draw overlaid assets using smoothed values if images are fully loaded
-        if (shouldDraw && imagesLoaded.current && frontImgRef.current && smoothed.current.x1 !== null) {
+        // Draw overlaid assets using smoothed values if images are ready
+        const isFrontReady = frontImgRef.current && (frontImgRef.current.naturalWidth > 0 || frontImgRef.current.complete);
+        if (shouldDraw && (imagesLoaded.current || isFrontReady) && frontImgRef.current && smoothed.current.x1 !== null) {
           const earLx = smoothed.current.x1;
           const earLy = smoothed.current.y1;
           const earRx = smoothed.current.x2;
