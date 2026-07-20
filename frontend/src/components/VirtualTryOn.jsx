@@ -137,6 +137,12 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       }
     };
 
+    const corsSafeUrl = (url) => {
+      if (!url) return '';
+      if (url.startsWith('data:')) return url;
+      return `${url}${url.includes('?') ? '&' : '?'}cors=1`;
+    };
+
     const frontImg = new Image();
     frontImg.crossOrigin = 'anonymous';
     frontImg.onload = () => {
@@ -150,7 +156,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
       toast.error('Try-On assets failed to load.');
     };
-    frontImg.src = frontPng;
+    frontImg.src = corsSafeUrl(frontPng);
     frontImgRef.current = frontImg;
 
     if (frontImg.complete && frontImg.naturalWidth > 0) {
@@ -470,8 +476,10 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           // GLASSES_FIT_RATIO: tuning constant. Real glasses usually extend slightly past the temple contour points.
           // We multiply by (frameWidthMm / 138) to respect the frame width slider customization.
           // Tuned to 1.22 to compensate for transparent asset padding and provide an organic, premium fit.
+          const safeFrameWidth = (Number(frameWidthMm) && Number(frameWidthMm) > 0) ? Number(frameWidthMm) : 138;
           const GLASSES_FIT_RATIO = 1.22;
-          const targetWidthPx = smoothedWidth * GLASSES_FIT_RATIO * (frameWidthMm / 138);
+          const rawTargetWidth = smoothedWidth * GLASSES_FIT_RATIO * (safeFrameWidth / 138);
+          const targetWidthPx = (Number.isFinite(rawTargetWidth) && rawTargetWidth > 0) ? rawTargetWidth : (smoothedWidth * GLASSES_FIT_RATIO);
 
           const frontImg = frontImgRef.current;
           const angleImg = angleImgRef.current;
@@ -492,7 +500,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const S = targetWidthPx / W;
 
           // Calculate vertical scale from pitch (foreshortens as user tilts head)
-          const verticalScale = Math.cos(smoothedPitch * (Math.PI / 180));
+          const pitchDeg = Number.isFinite(smoothedPitch) ? smoothedPitch : 0;
+          const verticalScale = Math.max(0.5, Math.min(1.0, Math.cos(pitchDeg * (Math.PI / 180))));
 
           // Set high-quality canvas anti-aliasing / smoothing
           ctx.imageSmoothingEnabled = true;
