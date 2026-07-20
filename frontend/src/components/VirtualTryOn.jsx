@@ -126,50 +126,37 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
   // 2. Pre-load transparent PNG assets
   useEffect(() => {
+    if (!frontPng) return;
     imagesLoaded.current = false;
-    let frontOk = false;
-    let angleOk = false;
-
-    const maybeUnblock = () => {
-      // Front PNG is mandatory. Angle PNG is optional — if it fails, we
-      // silently reuse the front image instead of blocking the whole feature.
-      if (frontOk) {
-        imagesLoaded.current = true;
-      }
-    };
 
     const frontImg = new Image();
-    frontImg.crossOrigin = 'anonymous';
     frontImg.onload = () => {
-      frontOk = true;
-      maybeUnblock();
+      imagesLoaded.current = true;
     };
-    frontImg.onerror = () => {
-      console.error('Failed to load front try-on PNG:', frontPng);
-      frontOk = false;
-      imagesLoaded.current = false;
-      setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
-      toast.error('Try-On assets failed to load.');
+    frontImg.onerror = (err) => {
+      console.error('Failed to load front try-on PNG:', frontPng, err);
+      if (frontImg.naturalWidth > 0) {
+        imagesLoaded.current = true;
+      }
     };
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
-    const angleImg = new Image();
-    angleImg.crossOrigin = 'anonymous';
-    angleImg.onload = () => { angleOk = true; maybeUnblock(); };
-    angleImg.onerror = () => {
-      console.error('Failed to load angle try-on PNG, falling back to front PNG:', anglePng);
-      // Fall back to the already-loading front image so the 3/4 angle
-      // blend simply reuses the front shot instead of breaking try-on.
-      angleImgRef.current = frontImgRef.current;
-      angleOk = true;
-      maybeUnblock();
-    };
-    angleImg.src = anglePng || frontPng;
+    if (frontImg.naturalWidth > 0) {
+      imagesLoaded.current = true;
+    }
+
     if (anglePng) {
-      angleImgRef.current = angleImg;
+      const angleImg = new Image();
+      angleImg.onload = () => {
+        angleImgRef.current = angleImg;
+      };
+      angleImg.onerror = () => {
+        angleImgRef.current = frontImgRef.current;
+      };
+      angleImg.src = anglePng;
     } else {
-      angleOk = true;
+      angleImgRef.current = frontImgRef.current;
     }
   }, [frontPng, anglePng]);
 
@@ -472,13 +459,16 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           ctx.restore();
 
           // 3. Calculate cross-fade blend opacity for 3/4 angle PNG
+          const activeAngleImg = (angleImgRef.current && angleImgRef.current.naturalWidth > 0 && angleImgRef.current !== frontImg) ? angleImgRef.current : null;
           let angleOpacity = 0;
-          const absYaw = Math.abs(smoothedYaw);
-          if (absYaw > 15) {
-            angleOpacity = Math.min(1, (absYaw - 15) / 15);
+          if (activeAngleImg) {
+            const absYaw = Math.abs(smoothedYaw);
+            if (absYaw > 15) {
+              angleOpacity = Math.min(1, (absYaw - 15) / 15);
+            }
           }
 
-          // 4. Draw Front Shot as a single, beautiful, unified frame (no slicing distortion)
+          // 4. Draw Front Shot (Always visible unless fully blended into a valid 3/4 angle PNG)
           if (angleOpacity < 1) {
             ctx.save();
             if (angleOpacity > 0) {
@@ -497,9 +487,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             ctx.restore();
           }
 
-          // 5. Draw Mirrored 3/4 Angled PNG
-          const angleImg = angleImgRef.current;
-          if (angleOpacity > 0 && angleImg && (angleImg.naturalWidth > 0 || angleImg.width > 0)) {
+          // 5. Draw Mirrored 3/4 Angled PNG if valid angle image exists
+          if (angleOpacity > 0 && activeAngleImg) {
             ctx.save();
             ctx.globalAlpha = angleOpacity;
             ctx.translate(cx, cy);
@@ -510,15 +499,15 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
               ctx.scale(-1, 1);
             }
 
-            const angleW = angleImg.naturalWidth || angleImg.width || W;
-            const angleH = angleImg.naturalHeight || angleImg.height || H;
+            const angleW = activeAngleImg.naturalWidth || W;
+            const angleH = activeAngleImg.naturalHeight || H;
             const aspect = angleW / angleH;
 
             const renderW = targetWidthPx;
             const renderH = (renderW / aspect) * verticalScale;
 
             ctx.drawImage(
-              angleImg,
+              activeAngleImg,
               -renderW / 2, -renderH / 2,
               renderW, renderH
             );
