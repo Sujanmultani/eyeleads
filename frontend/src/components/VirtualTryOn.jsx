@@ -153,6 +153,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
+    if (frontImg.complete && frontImg.naturalWidth > 0) {
+      frontOk = true;
+      maybeUnblock();
+    }
+
     const angleImg = new Image();
     angleImg.crossOrigin = 'anonymous';
     angleImg.onload = () => { angleOk = true; maybeUnblock(); };
@@ -385,10 +390,12 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             yawDeg = ((leftDist - rightDist) / (leftDist + rightDist)) * 60;
           }
 
-          // Landmark 234 = left face/temple contour point, 454 = right face/temple contour point
-          // We use raw (unflipped) coordinates; they map correctly because the context is mirrored.
-          const leftAnchor = landmarks[234];
-          const rightAnchor = landmarks[454];
+          // In raw un-mirrored video: landmark 454 (right face) has smaller x (left side of raw frame),
+          // landmark 234 (left face) has larger x (right side of raw frame).
+          // Assigning leftAnchor = 454 and rightAnchor = 234 ensures (x2 - x1) is positive,
+          // giving a tilt angle of ~0 deg (upright) instead of ~180 deg (upside-down & off-screen).
+          const leftAnchor = landmarks[454];
+          const rightAnchor = landmarks[234];
 
           // Map normalized landmark coords (0..1 against the RAW video
           // frame) into canvas pixel coords, accounting for the cover-crop
