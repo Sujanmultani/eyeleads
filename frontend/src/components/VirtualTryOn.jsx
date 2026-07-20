@@ -37,14 +37,18 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
 
-      // Use { exact: 'user' } in the first attempt to FORCE the front
-      // camera — the plain string 'user' is a soft preference that many
-      // Android browsers silently ignore, falling back to the rear camera.
-      // If the device has no front camera the exact constraint throws and
-      // we fall through to the soft-preference fallback attempt.
+      // Ask for a portrait-shaped stream as the first preference on mobile.
+      // This is a soft `ideal` hint, not `exact` — devices that can't match
+      // it just return their closest native mode instead of erroring or
+      // force-cropping (the earlier hardware-zoom bug was traced to CSS/
+      // canvas-buffer sizing, not to this kind of soft hint). Getting a
+      // stream whose native aspect is already close to the phone's screen
+      // means the software cover-crop below only needs to trim a little,
+      // instead of cropping away ~75% of a landscape frame — which is what
+      // was pushing temple landmarks outside the visible crop window.
       const constraintAttempts = isMobile
         ? [
-          { video: { facingMode: { exact: 'user' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+          { video: { facingMode: { exact: 'user' }, width: { ideal: 1080 }, height: { ideal: 1920 } }, audio: false },
           { video: { facingMode: { exact: 'user' } }, audio: false },
           { video: { facingMode: 'user' }, audio: false }
         ]
@@ -142,7 +146,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     frontImg.crossOrigin = 'anonymous';
     frontImg.onload = () => {
       frontOk = true;
-      console.log('[TryOn Debug] Front PNG loaded OK:', frontPng, frontImg.width, 'x', frontImg.height);
       maybeUnblock();
     };
     frontImg.onerror = () => {
@@ -392,10 +395,16 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const leftAnchor = landmarks[234];
           const rightAnchor = landmarks[454];
 
-          // Convert normalized coords (0..1 against the RAW video frame)
-          // into canvas pixel coords — must account for the cover-crop
-          // above (sx, sy, sWidth, sHeight), since the canvas no longer
-          // shows the full raw video 1:1 like it used to.
+          // Map normalized landmark coords (0..1 against the RAW video
+          // frame) into canvas pixel coords, accounting for the cover-crop
+          // (sx, sy, sWidth, sHeight) computed above. This MUST account for
+          // the crop — using canvas.width/height directly (as if the full
+          // uncropped frame were shown) misplaces off-center points like
+          // the temples, since only the [sx, sx+sWidth] x [sy, sy+sHeight]
+          // window of the video is actually visible on screen.
+          // Fix 2 below (portrait camera resolution hint) keeps this crop
+          // gentle enough on mobile that temple landmarks reliably stay
+          // inside the visible window.
           const mapX = (normX) => ((normX * vw) - sx) * (canvas.width / sWidth);
           const mapY = (normY) => ((normY * vh) - sy) * (canvas.height / sHeight);
 
@@ -434,18 +443,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           }
         }
 
-        // --- Temporary diagnostic logging (remove once glasses render confirmed) ---
-        if (!renderLoop._lastDebugLog || Date.now() - renderLoop._lastDebugLog > 1000) {
-          renderLoop._lastDebugLog = Date.now();
-          console.log('[TryOn Debug]', {
-            shouldDraw,
-            imagesLoaded: imagesLoaded.current,
-            hasFrontImg: !!frontImgRef.current,
-            smoothedX1: smoothed.current.x1,
-            faceDetectedThisFrame: !!(results && results.faceLandmarks && results.faceLandmarks.length > 0)
-          });
-        }
-        // ---------------------------------------------------------------------------
+
 
         // Draw overlaid assets using smoothed values if images are fully loaded
         if (shouldDraw && imagesLoaded.current && frontImgRef.current && smoothed.current.x1 !== null) {
