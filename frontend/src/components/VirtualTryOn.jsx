@@ -301,11 +301,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         // Clear canvas for this frame
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Apply a single global mirror transform for the entire frame
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.translate(-canvas.width, 0);
-
         // Software "cover" crop: figure out the largest centered region of
         // the raw video frame whose aspect ratio matches the screen, so we
         // only ever crop as much as the actual screen shape requires —
@@ -319,7 +314,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         // Without this, vw/vh = 0 → NaN in mapX/mapY → permanently
         // corrupts the EMA smoothed coords so glasses never appear.
         if (!vw || !vh || !canvas.width || !canvas.height) {
-          ctx.restore();
           requestRef.current = requestAnimationFrame(renderLoop);
           return;
         }
