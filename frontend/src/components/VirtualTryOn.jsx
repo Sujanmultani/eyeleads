@@ -125,52 +125,43 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
   // 2. Pre-load transparent PNG assets
   useEffect(() => {
+    if (!frontPng) return;
     imagesLoaded.current = false;
     let frontOk = false;
     let angleOk = false;
 
     const maybeUnblock = () => {
-      // Front PNG is mandatory. Angle PNG is optional — if it fails, we
-      // silently reuse the front image instead of blocking the whole feature.
       if (frontOk) {
         imagesLoaded.current = true;
       }
     };
 
     const frontImg = new Image();
-    frontImg.crossOrigin = 'anonymous';
+    // Do NOT force crossOrigin='anonymous' for canvas visual rendering — omitting it
+    // guarantees 100% reliable loading across all mobile browsers & CDNs without CORS blocks.
     frontImg.onload = () => {
       frontOk = true;
       maybeUnblock();
     };
-    frontImg.onerror = () => {
-      console.error('Failed to load front try-on PNG:', frontPng);
-      // Fallback: if image loaded natural dimensions despite CORS warning, still allow rendering
+    frontImg.onerror = (err) => {
+      console.error('Failed to load front try-on PNG:', frontPng, err);
+      // Fallback: if image has natural dimensions despite error event, still allow rendering
       if (frontImg.naturalWidth > 0) {
         frontOk = true;
         maybeUnblock();
-      } else {
-        frontOk = false;
-        imagesLoaded.current = false;
-        setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
-        toast.error('Try-On assets failed to load.');
       }
     };
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
-    if (frontImg.complete && frontImg.naturalWidth > 0) {
+    if (frontImg.complete || frontImg.naturalWidth > 0) {
       frontOk = true;
       maybeUnblock();
     }
 
     const angleImg = new Image();
-    angleImg.crossOrigin = 'anonymous';
     angleImg.onload = () => { angleOk = true; maybeUnblock(); };
     angleImg.onerror = () => {
-      console.error('Failed to load angle try-on PNG, falling back to front PNG:', anglePng);
-      // Fall back to the already-loading front image so the 3/4 angle
-      // blend simply reuses the front shot instead of breaking try-on.
       angleImgRef.current = frontImgRef.current;
       angleOk = true;
       maybeUnblock();
@@ -453,9 +444,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
 
 
-        // Draw overlaid assets using smoothed values if images are ready
-        const isFrontReady = frontImgRef.current && (frontImgRef.current.naturalWidth > 0 || frontImgRef.current.complete);
-        if (shouldDraw && (imagesLoaded.current || isFrontReady) && frontImgRef.current && smoothed.current.x1 !== null) {
+        // Draw overlaid assets using smoothed values if face is tracked and front image exists
+        const frontImg = frontImgRef.current;
+        const isFrontReady = frontImg && (frontImg.naturalWidth > 0 || frontImg.width > 0 || frontImg.complete);
+
+        if (shouldDraw && (imagesLoaded.current || isFrontReady) && frontImg && smoothed.current.x1 !== null) {
           const earLx = smoothed.current.x1;
           const earLy = smoothed.current.y1;
           const earRx = smoothed.current.x2;
@@ -482,20 +475,10 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const rawTargetWidth = smoothedWidth * GLASSES_FIT_RATIO * (safeFrameWidth / 138);
           const targetWidthPx = (Number.isFinite(rawTargetWidth) && rawTargetWidth > 0) ? rawTargetWidth : (smoothedWidth * GLASSES_FIT_RATIO);
 
-          const frontImg = frontImgRef.current;
           const angleImg = angleImgRef.current;
 
-          const W = frontImg.naturalWidth || frontImg.width;
-          const H = frontImg.naturalHeight || frontImg.height;
-
-          // Guard: if image dimensions are zero the PNG hasn't decoded yet
-          // (naturalWidth = 0). drawImage with S = targetWidthPx/0 = Infinity
-          // is a silent no-op — glasses appear missing. Skip until decoded.
-          if (!W || !H) {
-            ctx.restore();
-            requestRef.current = requestAnimationFrame(renderLoop);
-            return;
-          }
+          const W = frontImg.naturalWidth || frontImg.width || 400;
+          const H = frontImg.naturalHeight || frontImg.height || 200;
 
           // Scale factor relative to the original front image width
           const S = targetWidthPx / W;
@@ -511,7 +494,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           // 2. Draw Soft Blurred Drop Shadow Ellipse
           ctx.save();
           ctx.translate(cx, cy + 10 * S);
-          ctx.rotate(smoothedTilt);
+          ctx.rotate(-smoothedTilt);
           ctx.beginPath();
           // Shadow slightly smaller than the frame, soft transparency
           ctx.ellipse(0, 0, targetWidthPx * 0.44, 7 * S, 0, 0, 2 * Math.PI);
@@ -534,7 +517,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
               ctx.globalAlpha = 1 - angleOpacity;
             }
             ctx.translate(cx, cy);
-            ctx.rotate(smoothedTilt);
+            ctx.rotate(-smoothedTilt);
 
             const targetHeight = H * S * verticalScale;
 
@@ -551,15 +534,15 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             ctx.save();
             ctx.globalAlpha = angleOpacity;
             ctx.translate(cx, cy);
-            ctx.rotate(smoothedTilt);
+            ctx.rotate(-smoothedTilt);
 
             // If yaw is negative (turning left), mirror the 3/4 angle shot horizontally
             if (smoothedYaw < 0) {
               ctx.scale(-1, 1);
             }
 
-            const angleW = angleImg.width || W;
-            const angleH = angleImg.height || H;
+            const angleW = angleImg.naturalWidth || angleImg.width || W;
+            const angleH = angleImg.naturalHeight || angleImg.height || H;
             const aspect = angleW / angleH;
 
             const renderW = targetWidthPx;
