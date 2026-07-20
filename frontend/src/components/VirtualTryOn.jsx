@@ -476,8 +476,17 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const frontImg = frontImgRef.current;
           const angleImg = angleImgRef.current;
 
-          const W = frontImg.width;
-          const H = frontImg.height;
+          const W = frontImg.naturalWidth || frontImg.width;
+          const H = frontImg.naturalHeight || frontImg.height;
+
+          // Guard: if image dimensions are zero the PNG hasn't decoded yet
+          // (naturalWidth = 0). drawImage with S = targetWidthPx/0 = Infinity
+          // is a silent no-op — glasses appear missing. Skip until decoded.
+          if (!W || !H) {
+            ctx.restore();
+            requestRef.current = requestAnimationFrame(renderLoop);
+            return;
+          }
 
           // Scale factor relative to the original front image width
           const S = targetWidthPx / W;
