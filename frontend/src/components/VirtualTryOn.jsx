@@ -36,30 +36,37 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
   useEffect(() => {
     const startCamera = async () => {
       setLoadingStatus('Accessing camera stream...');
-      const isMobile = window.innerWidth <= 768;
-
-      // Do not request width/height resolution hints on mobile — mobile
-      // camera drivers interpret portrait resolution hints (e.g. 1080x1920)
-      // by performing a tight digital crop directly on the camera sensor
-      // (hardware zoom). Using facingMode alone gives the camera's full,
-      // uncropped wide field of view.
-      const constraintAttempts = isMobile
-        ? [
-          { video: { facingMode: { exact: 'user' } }, audio: false },
-          { video: { facingMode: 'user' }, audio: false }
-        ]
-        : [
-          {
-            video: {
-              facingMode: { exact: 'user' },
-              width: { ideal: 1920 },
-              height: { ideal: 1080 }
-            },
-            audio: false
+      // Request HD 1080p camera quality @ 60 FPS for maximum clarity
+      const constraintAttempts = [
+        {
+          video: {
+            facingMode: { exact: 'user' },
+            width: { ideal: 1920, min: 1280 },
+            height: { ideal: 1080, min: 720 },
+            frameRate: { ideal: 60, min: 30 }
           },
-          { video: { facingMode: { exact: 'user' } }, audio: false },
-          { video: { facingMode: 'user' }, audio: false }
-        ];
+          audio: false
+        },
+        {
+          video: {
+            facingMode: 'user',
+            width: { ideal: 1920, min: 1280 },
+            height: { ideal: 1080, min: 720 },
+            frameRate: { ideal: 60, min: 30 }
+          },
+          audio: false
+        },
+        {
+          video: {
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        },
+        { video: { facingMode: 'user' }, audio: false },
+        { video: true, audio: false }
+      ];
 
       let stream = null;
       let lastErr = null;
@@ -275,7 +282,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         // viewport while it was visually constrained to the smaller card,
         // producing an oversized/cropped result on desktop.
         const container = canvas.parentElement;
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
         const displayW = container ? Math.round(container.clientWidth * dpr) : video.videoWidth;
         const displayH = container ? Math.round(container.clientHeight * dpr) : video.videoHeight;
 
