@@ -125,30 +125,51 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
   // 2. Pre-load transparent PNG assets
   useEffect(() => {
-    if (!frontPng) return;
     imagesLoaded.current = false;
+    let frontOk = false;
+    let angleOk = false;
+
+    const maybeUnblock = () => {
+      // Front PNG is mandatory. Angle PNG is optional — if it fails, we
+      // silently reuse the front image instead of blocking the whole feature.
+      if (frontOk) {
+        imagesLoaded.current = true;
+      }
+    };
 
     const frontImg = new Image();
+    frontImg.crossOrigin = 'anonymous';
     frontImg.onload = () => {
-      imagesLoaded.current = true;
+      frontOk = true;
+      maybeUnblock();
     };
-    frontImg.onerror = (err) => {
-      console.error('Failed to load front try-on PNG:', frontPng, err);
+    frontImg.onerror = () => {
+      console.error('Failed to load front try-on PNG:', frontPng);
+      frontOk = false;
+      imagesLoaded.current = false;
+      setCameraError('Could not load the glasses image for try-on. Please try again in a moment.');
+      toast.error('Try-On assets failed to load.');
     };
     frontImg.src = frontPng;
     frontImgRef.current = frontImg;
 
-    if (frontImg.naturalWidth > 0) {
-      imagesLoaded.current = true;
-    }
-
     const angleImg = new Image();
-    angleImg.onload = () => {};
+    angleImg.crossOrigin = 'anonymous';
+    angleImg.onload = () => { angleOk = true; maybeUnblock(); };
     angleImg.onerror = () => {
+      console.error('Failed to load angle try-on PNG, falling back to front PNG:', anglePng);
+      // Fall back to the already-loading front image so the 3/4 angle
+      // blend simply reuses the front shot instead of breaking try-on.
       angleImgRef.current = frontImgRef.current;
+      angleOk = true;
+      maybeUnblock();
     };
     angleImg.src = anglePng || frontPng;
-    angleImgRef.current = angleImg;
+    if (anglePng) {
+      angleImgRef.current = angleImg;
+    } else {
+      angleOk = true;
+    }
   }, [frontPng, anglePng]);
 
   // 3. Initialize MediaPipe FaceLandmarker
@@ -312,7 +333,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           sx = (vw - sWidth) / 2;
           sy = 0;
         } else {
-          // Video is proportionally taller than the screen — crop top/bottom
           sWidth = vw;
           sHeight = vw / cAspect;
           sx = 0;
@@ -320,7 +340,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         }
 
         // 1. Draw the mirrored, cover-cropped video frame onto the canvas
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.translate(-canvas.width, 0);
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+        ctx.restore(); // Restore immediately to un-mirrored screen coordinates for landmark overlay
 
         // Run face detection on the current video frame
         const nowInMs = performance.now();
@@ -334,7 +358,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
           const landmarks = results.faceLandmarks[0];
 
-          // Get facial transformation matrix for 3D pose extraction
           let yawDeg = 0;
           let pitchDeg = 0;
           let rollDeg = 0;
@@ -349,7 +372,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             pitchDeg = pitch * (180 / Math.PI);
             rollDeg = roll * (180 / Math.PI);
           } else {
-            // Fallback Euler angle calculation from landmark geometry if matrix is missing
             const leftOuter = landmarks[33];
             const rightOuter = landmarks[263];
             const noseBridge = landmarks[168];
@@ -358,36 +380,22 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             const dy = rightOuter.y - leftOuter.y;
             rollDeg = Math.atan2(dy, dx) * (180 / Math.PI);
 
-            // Yaw approximation based on nose shift relative to eye centers
             const leftDist = noseBridge.x - leftOuter.x;
             const rightDist = rightOuter.x - noseBridge.x;
             yawDeg = ((leftDist - rightDist) / (leftDist + rightDist)) * 60;
           }
 
-          // In raw un-mirrored video: landmark 454 (right face) has smaller x (left side of raw frame),
-          // landmark 234 (left face) has larger x (right side of raw frame).
-          // Assigning leftAnchor = 454 and rightAnchor = 234 ensures (x2 - x1) is positive,
-          // giving a tilt angle of ~0 deg (upright) instead of ~180 deg (upside-down & off-screen).
-          const leftAnchor = landmarks[454];
-          const rightAnchor = landmarks[234];
+          // Map normalized video landmark coords [0..1] directly to screen canvas pixel coordinates.
+          // Because video is drawn mirrored, screen X = (1.0 - normalizedX_in_crop) * canvas.width.
+          const mapX = (normX) => (1.0 - ((normX * vw - sx) / sWidth)) * canvas.width;
+          const mapY = (normY) => ((normY * vh - sy) / sHeight) * canvas.height;
 
-          // Map normalized landmark coords (0..1 against the RAW video
-          // frame) into canvas pixel coords, accounting for the cover-crop
-          // (sx, sy, sWidth, sHeight) computed above. This MUST account for
-          // the crop — using canvas.width/height directly (as if the full
-          // uncropped frame were shown) misplaces off-center points like
-          // the temples, since only the [sx, sx+sWidth] x [sy, sy+sHeight]
-          // window of the video is actually visible on screen.
-          // Fix 2 below (portrait camera resolution hint) keeps this crop
-          // gentle enough on mobile that temple landmarks reliably stay
-          // inside the visible window.
-          const mapX = (normX) => ((normX * vw) - sx) * (canvas.width / sWidth);
-          const mapY = (normY) => ((normY * vh) - sy) * (canvas.height / sHeight);
-
-          const x1 = mapX(leftAnchor.x);
-          const y1 = mapY(leftAnchor.y);
-          const x2 = mapX(rightAnchor.x);
-          const y2 = mapY(rightAnchor.y);
+          // Landmark 454 = right cheek (smaller x in raw video -> left side of screen)
+          // Landmark 234 = left cheek (larger x in raw video -> right side of screen)
+          const x1 = mapX(landmarks[454].x);
+          const y1 = mapY(landmarks[454].y);
+          const x2 = mapX(landmarks[234].x);
+          const y2 = mapY(landmarks[234].y);
 
           // Vertical position of the nose bridge (Landmark 168)
           const noseY = mapY(landmarks[168].y);
@@ -410,21 +418,17 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             setNoFaceTimer(Math.floor(timeSinceLastFace / 1000));
           }
 
-          // If face is temporarily lost (less than 500ms), bridge the gap using last known smoothed values
           if (timeSinceLastFace < 500 && smoothed.current.x1 !== null) {
             shouldDraw = true;
           } else if (timeSinceLastFace >= 500) {
-            // Reset smoothed values when face is lost for a sustained period (>500ms)
             smoothed.current = { x1: null, y1: null, x2: null, y2: null, noseY: null, yaw: null, pitch: null };
           }
         }
 
-
-
         // Draw overlaid assets using smoothed values once face is tracked & image is decoded in memory
         const frontImg = frontImgRef.current;
 
-        if (shouldDraw && frontImg && frontImg.naturalWidth > 0 && smoothed.current.x1 !== null) {
+        if (shouldDraw && frontImg && (frontImg.naturalWidth > 0 || frontImg.width > 0 || frontImg.complete) && smoothed.current.x1 !== null) {
           const earLx = smoothed.current.x1;
           const earLy = smoothed.current.y1;
           const earRx = smoothed.current.x2;
@@ -433,25 +437,18 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           const smoothedYaw = smoothed.current.yaw;
           const smoothedPitch = smoothed.current.pitch;
 
-          // Derived smoothed coordinates
           const smoothedWidth = Math.hypot(earRx - earLx, earRy - earLy);
           const smoothedTilt = Math.atan2(earRy - earLy, earRx - earLx);
           const midX = (earLx + earRx) / 2;
           const midY = (earLy + earRy) / 2;
 
-          // Center coordinates (averaging midpoint Y with nose bridge Y for vertical stability)
           const cx = midX;
           const cy = (midY + smoothedNoseY) / 2;
 
-          // GLASSES_FIT_RATIO: tuning constant. Real glasses usually extend slightly past the temple contour points.
-          // We multiply by (frameWidthMm / 138) to respect the frame width slider customization.
-          // Tuned to 1.22 to compensate for transparent asset padding and provide an organic, premium fit.
           const safeFrameWidth = (Number(frameWidthMm) && Number(frameWidthMm) > 0) ? Number(frameWidthMm) : 138;
           const GLASSES_FIT_RATIO = 1.22;
           const rawTargetWidth = smoothedWidth * GLASSES_FIT_RATIO * (safeFrameWidth / 138);
           const targetWidthPx = (Number.isFinite(rawTargetWidth) && rawTargetWidth > 0) ? rawTargetWidth : (smoothedWidth * GLASSES_FIT_RATIO);
-
-          const angleImg = angleImgRef.current;
 
           const W = frontImg.naturalWidth || frontImg.width || 400;
           const H = frontImg.naturalHeight || frontImg.height || 200;
@@ -470,9 +467,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           // 2. Draw Soft Blurred Drop Shadow Ellipse
           ctx.save();
           ctx.translate(cx, cy + 10 * S);
-          ctx.rotate(-smoothedTilt);
+          ctx.rotate(smoothedTilt);
           ctx.beginPath();
-          // Shadow slightly smaller than the frame, soft transparency
           ctx.ellipse(0, 0, targetWidthPx * 0.44, 7 * S, 0, 0, 2 * Math.PI);
           ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
           ctx.filter = 'blur(6px)';
@@ -493,7 +489,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
               ctx.globalAlpha = 1 - angleOpacity;
             }
             ctx.translate(cx, cy);
-            ctx.rotate(-smoothedTilt);
+            ctx.rotate(smoothedTilt);
 
             const targetHeight = H * S * verticalScale;
 
@@ -506,11 +502,12 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           }
 
           // 5. Draw Mirrored 3/4 Angled PNG
-          if (angleOpacity > 0 && angleImg) {
+          const angleImg = angleImgRef.current;
+          if (angleOpacity > 0 && angleImg && (angleImg.naturalWidth > 0 || angleImg.width > 0)) {
             ctx.save();
             ctx.globalAlpha = angleOpacity;
             ctx.translate(cx, cy);
-            ctx.rotate(-smoothedTilt);
+            ctx.rotate(smoothedTilt);
 
             // If yaw is negative (turning left), mirror the 3/4 angle shot horizontally
             if (smoothedYaw < 0) {
@@ -533,8 +530,6 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           }
         }
 
-        // Restore global mirror context at the end of the frame
-        ctx.restore();
       }
 
       requestRef.current = requestAnimationFrame(renderLoop);
