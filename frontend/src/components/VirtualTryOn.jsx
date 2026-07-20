@@ -37,18 +37,13 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
       setLoadingStatus('Accessing camera stream...');
       const isMobile = window.innerWidth <= 768;
 
-      // Ask for a portrait-shaped stream as the first preference on mobile.
-      // This is a soft `ideal` hint, not `exact` — devices that can't match
-      // it just return their closest native mode instead of erroring or
-      // force-cropping (the earlier hardware-zoom bug was traced to CSS/
-      // canvas-buffer sizing, not to this kind of soft hint). Getting a
-      // stream whose native aspect is already close to the phone's screen
-      // means the software cover-crop below only needs to trim a little,
-      // instead of cropping away ~75% of a landscape frame — which is what
-      // was pushing temple landmarks outside the visible crop window.
+      // Do not request width/height resolution hints on mobile — mobile
+      // camera drivers interpret portrait resolution hints (e.g. 1080x1920)
+      // by performing a tight digital crop directly on the camera sensor
+      // (hardware zoom). Using facingMode alone gives the camera's full,
+      // uncropped wide field of view.
       const constraintAttempts = isMobile
         ? [
-          { video: { facingMode: { exact: 'user' }, width: { ideal: 1080 }, height: { ideal: 1920 } }, audio: false },
           { video: { facingMode: { exact: 'user' } }, audio: false },
           { video: { facingMode: 'user' }, audio: false }
         ]
