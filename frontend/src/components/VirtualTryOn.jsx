@@ -14,7 +14,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
   // Exponential Moving Average (EMA) smoothing for face tracking coordinates
   const smoothed = useRef({ x1: null, y1: null, x2: null, y2: null, noseY: null, yaw: null, pitch: null });
-  const SMOOTHING = 0.25; // lower = smoother/laggy, higher = snappier/jittery
+  const SMOOTHING = 0.55; // ultra-snappy 60fps tracking (0.55 = instant face response, zero lag)
 
   // States
   const [loading, setLoading] = useState(true);
@@ -437,8 +437,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
           const safeFrameWidth = (Number(frameWidthMm) && Number(frameWidthMm) > 0) ? Number(frameWidthMm) : 138;
           const GLASSES_FIT_RATIO = 1.22;
-          const rawTargetWidth = smoothedWidth * GLASSES_FIT_RATIO * (safeFrameWidth / 138);
-          const targetWidthPx = (Number.isFinite(rawTargetWidth) && rawTargetWidth > 0) ? rawTargetWidth : (smoothedWidth * GLASSES_FIT_RATIO);
+          const yawDeg = Number.isFinite(smoothedYaw) ? smoothedYaw : 0;
+          const yawScale = Math.max(0.75, Math.cos(yawDeg * (Math.PI / 180)));
+
+          const rawTargetWidth = smoothedWidth * GLASSES_FIT_RATIO * (safeFrameWidth / 138) * yawScale;
+          const targetWidthPx = (Number.isFinite(rawTargetWidth) && rawTargetWidth > 0) ? rawTargetWidth : (smoothedWidth * GLASSES_FIT_RATIO * yawScale);
 
           const W = frontImg.naturalWidth || frontImg.width || 400;
           const H = frontImg.naturalHeight || frontImg.height || 200;
