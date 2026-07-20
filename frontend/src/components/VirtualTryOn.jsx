@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Camera, X, RefreshCw, AlertTriangle, Check, ArrowLeftRight } from 'lucide-react';
 import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
 import { toast } from './Toast';
@@ -559,7 +560,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     }
   };
 
-  return (
+  return createPortal(
     <div
       ref={containerRef}
       className="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center overflow-hidden select-none animate-fadeIn"
@@ -702,7 +703,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Tap to take a picture</span>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 
