@@ -30,6 +30,7 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
   // Keep track of face presence to trigger "align face" notification
   const lastFaceTime = useRef(Date.now());
+  const faceDetectedRef = useRef(false);
 
   // 1. Request Camera Access and Setup Stream
   useEffect(() => {
@@ -232,9 +233,9 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
     if (loading || cameraError) return;
 
     const smooth = (key, newValue) => {
-      if (smoothed.current[key] === null) {
+      if (smoothed.current[key] === null || Number.isNaN(smoothed.current[key])) {
         smoothed.current[key] = newValue; // first frame, no history yet
-      } else {
+      } else if (Number.isFinite(newValue)) {
         smoothed.current[key] = smoothed.current[key] + SMOOTHING * (newValue - smoothed.current[key]);
       }
       return smoothed.current[key];
@@ -291,7 +292,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         const displayW = container ? Math.round(container.clientWidth * dpr) : video.videoWidth;
         const displayH = container ? Math.round(container.clientHeight * dpr) : video.videoHeight;
 
-        if (canvas.width !== displayW || canvas.height !== displayH) {
+        // Only resize canvas buffer if dimension change is > 2px to prevent subpixel resize jitter
+        if (Math.abs(canvas.width - displayW) > 2 || Math.abs(canvas.height - displayH) > 2) {
           canvas.width = displayW;
           canvas.height = displayH;
         }
@@ -353,7 +355,10 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
         let shouldDraw = false;
 
         if (results && results.faceLandmarks && results.faceLandmarks.length > 0) {
-          setFaceDetected(true);
+          if (!faceDetectedRef.current) {
+            faceDetectedRef.current = true;
+            setFaceDetected(true);
+          }
           lastFaceTime.current = Date.now();
 
           const landmarks = results.faceLandmarks[0];
@@ -411,7 +416,10 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
 
           shouldDraw = true;
         } else {
-          setFaceDetected(false);
+          if (faceDetectedRef.current) {
+            faceDetectedRef.current = false;
+            setFaceDetected(false);
+          }
           const timeSinceLastFace = Date.now() - lastFaceTime.current;
 
           if (timeSinceLastFace > 2000) {
