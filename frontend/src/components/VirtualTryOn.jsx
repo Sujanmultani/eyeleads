@@ -341,12 +341,8 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           sy = (vh - sHeight) / 2;
         }
 
-        // 1. Draw the mirrored, cover-cropped video frame onto the canvas
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.translate(-canvas.width, 0);
+        // 1. Draw cover-cropped video frame onto the canvas (GPU CSS handles screen mirroring)
         ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-        ctx.restore(); // Restore immediately to un-mirrored screen coordinates for landmark overlay
 
         // Run face detection on the current video frame
         const nowInMs = performance.now();
@@ -390,17 +386,15 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
             yawDeg = ((leftDist - rightDist) / (leftDist + rightDist)) * 60;
           }
 
-          // Map normalized video landmark coords [0..1] directly to screen canvas pixel coordinates.
-          // Because video is drawn mirrored, screen X = (1.0 - normalizedX_in_crop) * canvas.width.
-          const mapX = (normX) => (1.0 - ((normX * vw - sx) / sWidth)) * canvas.width;
+          // Map normalized video landmark coords [0..1] directly to canvas pixel coordinates.
+          const mapX = (normX) => ((normX * vw - sx) / sWidth) * canvas.width;
           const mapY = (normY) => ((normY * vh - sy) / sHeight) * canvas.height;
 
-          // Landmark 454 = right cheek (smaller x in raw video -> left side of screen)
-          // Landmark 234 = left cheek (larger x in raw video -> right side of screen)
-          const x1 = mapX(landmarks[454].x);
-          const y1 = mapY(landmarks[454].y);
-          const x2 = mapX(landmarks[234].x);
-          const y2 = mapY(landmarks[234].y);
+          // Landmark 234 = left temple (smaller x), Landmark 454 = right temple (larger x)
+          const x1 = mapX(landmarks[234].x);
+          const y1 = mapY(landmarks[234].y);
+          const x2 = mapX(landmarks[454].x);
+          const y2 = mapY(landmarks[454].y);
 
           // Vertical position of the nose bridge (Landmark 168)
           const noseY = mapY(landmarks[168].y);
@@ -632,12 +626,11 @@ const VirtualTryOn = ({ frontPng, anglePng, frameWidthMm = 138, productName, onC
           className="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none"
         />
 
-        {/* Composited AR Overlay Canvas — buffer already matches container
-            exactly via JS cover-crop above, so no CSS object-fit needed */}
+        {/* Composited AR Overlay Canvas — GPU mirrored via CSS transform for 60fps rock-solid stability */}
         <canvas
           ref={canvasRef}
           className="w-full h-full block"
-          style={{ background: '#0f172a' }}
+          style={{ background: '#0f172a', transform: 'scaleX(-1)' }}
         />
 
         {/* Alignment Helper Target Oval */}
