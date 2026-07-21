@@ -6513,6 +6513,8 @@ const Admin = () => {
             </div>
           </div>
         </div>
+      )}
+
       {/* 9. EDIT SHIPPING ADDRESS MODAL OVERLAY */}
       {isEditAddressOpen && (
         <div className="fixed inset-0 z-[110] bg-[#0F2744]/70 backdrop-blur-xs flex items-center justify-center p-4 select-none">
