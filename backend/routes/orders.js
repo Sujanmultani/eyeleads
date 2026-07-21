@@ -1561,4 +1561,99 @@ router.put('/:id/refund', protect, adminOnly, async (req, res, next) => {
   }
 });
 
+// @desc    Admin: update an order's shipping address (only while order hasn't shipped yet)
+// @route   PUT /api/orders/:id/admin-update-address
+// @access  Private/Admin
+router.put('/:id/admin-update-address', protect, adminOnly, async (req, res, next) => {
+  const { name, address, city, state, zipCode, phone } = req.body;
+
+  try {
+    if (process.env.DB_CONNECTED !== 'true') {
+      const order = MOCK_ORDERS.find(o => o._id === req.params.id);
+      if (!order) return res.status(404).json({ message: 'Order not found.' });
+
+      if (!['Not Ready', 'Processing'].includes(order.deliveryStatus)) {
+        return res.status(400).json({
+          message: `Address can only be edited while the order is Not Ready or Processing. This order is currently "${order.deliveryStatus}".`
+        });
+      }
+
+      if (!order.shippingAddress) order.shippingAddress = {};
+      const before = { ...order.shippingAddress };
+      if (name) order.shippingAddress.name = name;
+      if (address) order.shippingAddress.address = address;
+      if (city) order.shippingAddress.city = city;
+      if (state) order.shippingAddress.state = state;
+      if (zipCode) {
+        order.shippingAddress.zipCode = zipCode;
+        order.shippingAddress.pincode = zipCode;
+      }
+      if (phone) order.shippingAddress.phone = phone;
+      order.lastModifiedAt = new Date();
+
+      await logActivity(
+        req.user.email || req.user._id.toString(),
+        'ORDER_ADDRESS_EDITED_BY_ADMIN',
+        'Order',
+        `Admin updated shipping address for order ${order.orderNumber}. Before: ${JSON.stringify(before)}`,
+        req.ip
+      );
+
+      sendEmail({
+        to: order.shippingAddress?.email || 'customer@example.com',
+        subject: `Your EyeLeads order ${order.orderNumber}'s shipping address was updated`,
+        html: `<p>Hi ${order.shippingAddress?.name || 'Valued Customer'},</p><p>Our team has updated the shipping address for your order <strong>${order.orderNumber}</strong> as requested. If you did not request this change, please contact support immediately.</p>`
+      });
+
+      return res.json({ status: 'success', order });
+    }
+
+    const order = await Order.findById(req.params.id).populate('user', 'email name');
+    if (!order) return res.status(404).json({ message: 'Order not found.' });
+
+    if (!['Not Ready', 'Processing'].includes(order.deliveryStatus)) {
+      return res.status(400).json({
+        message: `Address can only be edited while the order is Not Ready or Processing. This order is currently "${order.deliveryStatus}".`
+      });
+    }
+
+    const before = { ...order.shippingAddress.toObject() };
+    if (name) order.shippingAddress.name = name;
+    if (address) order.shippingAddress.address = address;
+    if (city) order.shippingAddress.city = city;
+    if (state) order.shippingAddress.state = state;
+    if (zipCode) {
+      order.shippingAddress.zipCode = zipCode;
+      order.shippingAddress.pincode = zipCode;
+    }
+    if (phone) order.shippingAddress.phone = phone;
+    order.lastModifiedAt = new Date();
+    await order.save();
+
+    await logActivity(
+      req.user.email || req.user._id.toString(),
+      'ORDER_ADDRESS_EDITED_BY_ADMIN',
+      'Order',
+      `Admin updated shipping address for order ${order.orderNumber}. Before: ${JSON.stringify(before)}`,
+      req.ip
+    );
+
+    await Notification.create({
+      type: 'order_modified',
+      order: order._id,
+      message: `Order ${order.orderNumber}'s shipping address was updated by an admin.`
+    });
+
+    sendEmail({
+      to: order.shippingAddress.email || order.user.email,
+      subject: `Your EyeLeads order ${order.orderNumber}'s shipping address was updated`,
+      html: `<p>Hi ${order.shippingAddress.name || order.user.name},</p><p>Our team has updated the shipping address for your order <strong>${order.orderNumber}</strong> as requested. If you did not request this change, please contact support immediately.</p>`
+    });
+
+    res.json({ status: 'success', order });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

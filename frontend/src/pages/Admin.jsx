@@ -164,6 +164,35 @@ const Admin = () => {
   const [isBulkSaving, setIsBulkSaving] = useState(false);
   const [deliveryNotes, setDeliveryNotes] = useState('');
 
+  const [isEditAddressOpen, setIsEditAddressOpen] = useState(false);
+  const [addressEditForm, setAddressEditForm] = useState({ name: '', address: '', city: '', state: '', zipCode: '', phone: '' });
+
+  const openEditAddress = () => {
+    setAddressEditForm({
+      name: selectedOrder?.shippingAddress?.name || '',
+      address: selectedOrder?.shippingAddress?.address || '',
+      city: selectedOrder?.shippingAddress?.city || '',
+      state: selectedOrder?.shippingAddress?.state || '',
+      zipCode: selectedOrder?.shippingAddress?.zipCode || selectedOrder?.shippingAddress?.pincode || '',
+      phone: selectedOrder?.shippingAddress?.phone || ''
+    });
+    setIsEditAddressOpen(true);
+  };
+
+  const handleSaveAddress = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await api.put(`/api/orders/${selectedOrder._id}/admin-update-address`, addressEditForm);
+      setSelectedOrder(data.order);
+      setOrders(orders.map((o) => (o._id === data.order._id ? data.order : o)));
+      setIsEditAddressOpen(false);
+      toast.success('Shipping address updated.');
+    } catch (err) {
+      console.error('Failed to update address:', err);
+      toast.error(err.response?.data?.message || 'Failed to update address.');
+    }
+  };
+
   const [dragActive, setDragActive] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
 
@@ -5561,9 +5590,20 @@ const Admin = () => {
                 <div className="md:col-span-5 space-y-6 text-left">
                   {/* Address coordinates */}
                   <div className="space-y-3.5">
-                    <h4 className="font-extrabold text-navy-dark text-xs uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-gold-accent" />
-                      <span>Shipping Coordinates</span>
+                    <h4 className="font-extrabold text-navy-dark text-xs uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between gap-1.5">
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4 text-gold-accent" />
+                        <span>Shipping Coordinates</span>
+                      </span>
+                      {['Not Ready', 'Processing'].includes(selectedOrder.deliveryStatus) && (
+                        <button
+                          type="button"
+                          onClick={openEditAddress}
+                          className="text-[9px] font-extrabold uppercase tracking-wider text-[#B8952A] hover:underline cursor-pointer"
+                        >
+                          Edit Address
+                        </button>
+                      )}
                     </h4>
 
                     {selectedOrder.shippingAddress ? (
@@ -6471,6 +6511,34 @@ const Admin = () => {
                 Save Details & Dispatch
               </button>
             </div>
+          </div>
+        </div>
+      {/* 9. EDIT SHIPPING ADDRESS MODAL OVERLAY */}
+      {isEditAddressOpen && (
+        <div className="fixed inset-0 z-[110] bg-[#0F2744]/70 backdrop-blur-xs flex items-center justify-center p-4 select-none">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 space-y-5 border border-slate-100 shadow-luxury">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-light font-serif text-navy-dark">Edit Shipping Address</h3>
+              <button onClick={() => setIsEditAddressOpen(false)} className="p-2 rounded-full text-slate-400 hover:text-navy-primary hover:bg-slate-50 cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveAddress} className="space-y-3 text-xs font-bold text-text-muted">
+              <input type="text" required placeholder="Recipient Name" value={addressEditForm.name} onChange={(e) => setAddressEditForm({ ...addressEditForm, name: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+              <input type="text" required placeholder="Address" value={addressEditForm.address} onChange={(e) => setAddressEditForm({ ...addressEditForm, address: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" required placeholder="City" value={addressEditForm.city} onChange={(e) => setAddressEditForm({ ...addressEditForm, city: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+                <input type="text" required placeholder="State" value={addressEditForm.state} onChange={(e) => setAddressEditForm({ ...addressEditForm, state: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" required placeholder="Zip Code" value={addressEditForm.zipCode} onChange={(e) => setAddressEditForm({ ...addressEditForm, zipCode: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+                <input type="text" required placeholder="Phone" value={addressEditForm.phone} onChange={(e) => setAddressEditForm({ ...addressEditForm, phone: e.target.value })} className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50" />
+              </div>
+              <div className="pt-3 flex justify-end gap-3 border-t border-slate-100">
+                <button type="button" onClick={() => setIsEditAddressOpen(false)} className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer">Cancel</button>
+                <button type="submit" className="px-6 py-3 rounded-xl bg-[#B8952A] text-white hover:bg-amber-600 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer shadow">Save Address</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

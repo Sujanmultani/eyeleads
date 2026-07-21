@@ -113,7 +113,20 @@ const ProductDetail = () => {
 
   // Custom states
   const [product, setProduct] = useState(null);
+  const [cleaningKits, setCleaningKits] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchCleaningKits = async () => {
+      try {
+        const { data } = await api.get('/api/products', { params: { category: 'Cleaning Kits' } });
+        setCleaningKits(data.products || data || []);
+      } catch (err) {
+        console.error('Failed to load cleaning kits:', err);
+      }
+    };
+    fetchCleaningKits();
+  }, []);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
@@ -2507,6 +2520,42 @@ const ProductDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* Cleaning Kits Add-On Section */}
+      {cleaningKits.filter(k => k._id !== product?._id).length > 0 && (
+        <div className="mt-12 border-t border-slate-100 pt-10">
+          <h3 className="text-lg font-serif font-light text-navy-dark mb-1">Complete Your Order</h3>
+          <p className="text-xs text-slate-500 mb-6">Keep your new frames spotless with a cleaning kit.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {cleaningKits.filter(k => k._id !== product?._id).map((kit) => (
+              <div key={kit._id} className="border border-slate-200 rounded-2xl p-3 flex flex-col gap-2 hover:border-gold-accent transition-colors bg-white">
+                <img src={kit.image} alt={kit.name} className="w-full aspect-square object-contain bg-slate-50 rounded-xl" />
+                <p className="text-xs font-bold text-navy-dark line-clamp-2">{kit.name}</p>
+                <p className="text-sm font-extrabold text-gold-accent">₹{kit.price}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart({
+                      _id: kit._id,
+                      name: kit.name,
+                      price: kit.price,
+                      image: kit.image,
+                      category: kit.category || 'Cleaning Kits'
+                    }, 1, {
+                      color: 'Default Standard',
+                      size: 'One Size'
+                    });
+                    toast.success(`Added ${kit.name} to your cart!`);
+                  }}
+                  className="mt-auto w-full py-2 bg-navy-dark hover:bg-gold-accent hover:text-navy-dark text-white text-[10px] font-extrabold uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recently Viewed Products / Slider Section */}
       {relatedProducts && relatedProducts.length > 0 && (
