@@ -640,6 +640,33 @@ const Admin = () => {
     }
   };
 
+  const handleAddCleaningKitImageUpload = async (e) => {
+    e.preventDefault();
+    if (!(e.target.files && e.target.files[0])) return;
+
+    setImageUploading(true);
+    const formData = new FormData();
+    formData.append('images', e.target.files[0]);
+
+    try {
+      const response = await api.post('/api/upload/products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const uploadedUrls = response.data.urls || [];
+      if (uploadedUrls.length > 0) {
+        setProductForm(prev => ({ ...prev, image: uploadedUrls[0] }));
+        toast.success('Cleaning kit image uploaded!');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error(err.response?.data?.message || 'Failed to upload image. Please check your connection.');
+    } finally {
+      setImageUploading(false);
+      e.target.value = '';
+    }
+  };
+
   const uploadProductVideo = async (file) => {
     setProductVideoUploading(true);
     const formData = new FormData();
@@ -3939,7 +3966,7 @@ const Admin = () => {
                       type="file"
                       accept="image/*"
                       id="cleaning-kit-file-upload-add"
-                      onChange={handlePrimaryImageUpload}
+                      onChange={handleAddCleaningKitImageUpload}
                       className="hidden"
                     />
                     <label
