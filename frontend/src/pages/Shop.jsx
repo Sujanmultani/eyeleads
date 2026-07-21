@@ -136,7 +136,7 @@ const Shop = () => {
   };
 
   // Available Filter Options lists
-  const categoriesList = ['Eyeglasses', 'Sunglasses', 'Computer Glasses', 'Sports', 'Kids', 'Sale'];
+  const categoriesList = ['Eyeglasses', 'Sunglasses', 'Computer Glasses', 'Sports', 'Kids', 'Accessories', 'Cleaning Kits', 'Sale'];
   const shapesList = ['Round', 'Square', 'Rectangle', 'Aviator', 'Cat-Eye', 'Wayfarer', 'Oval'];
   const gendersList = ['Men', 'Women', 'Unisex', 'Kids'];
 

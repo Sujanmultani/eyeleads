@@ -15,24 +15,24 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, 'Please select a category'],
-      enum: ['Eyeglasses', 'Sunglasses', 'Computer Glasses', 'Sports', 'Kids']
+      enum: ['Eyeglasses', 'Sunglasses', 'Computer Glasses', 'Sports', 'Kids', 'Accessories', 'Cleaning Kits']
     },
     frameShape: {
       type: String,
-      required: [true, 'Please select a frame shape']
+      default: 'Standard'
     },
     material: {
       type: String,
-      required: [true, 'Please select a frame material']
+      default: 'Standard'
     },
     gender: {
       type: String,
-      required: [true, 'Please specify target gender'],
+      default: 'Unisex',
       enum: ['Men', 'Women', 'Unisex', 'Kids']
     },
     colors: {
       type: [String],
-      required: [true, 'Please specify at least one color']
+      default: ['Default']
     },
     price: {
       type: Number,
@@ -140,7 +140,9 @@ productSchema.pre('save', async function (next) {
       'Sunglasses': 'SG',
       'Computer Glasses': 'CG',
       'Sports': 'SP',
-      'Kids': 'KD'
+      'Kids': 'KD',
+      'Accessories': 'ACC',
+      'Cleaning Kits': 'CLK'
     }[this.category] || 'EL';
     const year = new Date().getFullYear().toString().slice(-2);
     const rand = Math.random().toString(36).substring(2, 6).toUpperCase();

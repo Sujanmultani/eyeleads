@@ -3847,6 +3847,8 @@ const Admin = () => {
                   <option value="Computer Glasses">Computer Glasses</option>
                   <option value="Sports">Sports</option>
                   <option value="Kids">Kids</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Cleaning Kits">Cleaning Kits</option>
                 </select>
               </div>
 
@@ -4436,6 +4438,8 @@ const Admin = () => {
                     <option value="Computer Glasses">Computer Glasses</option>
                     <option value="Sports">Sports</option>
                     <option value="Kids">Kids</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Cleaning Kits">Cleaning Kits</option>
                   </select>
                 </div>
 
