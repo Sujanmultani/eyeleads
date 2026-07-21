@@ -134,8 +134,19 @@ router.get('/', async (req, res, next) => {
       }
 
       if (req.query.gender) {
-        const g = req.query.gender.trim().toLowerCase();
-        filtered = filtered.filter(p => p.gender.toLowerCase() === g);
+        const targetGenders = req.query.gender.split(',').map(g => g.trim().toLowerCase());
+        filtered = filtered.filter(p => {
+          const pGender = (p.gender || '').toLowerCase();
+          return targetGenders.some(tg => {
+            if (tg === 'men' || tg === 'male' || tg === 'man') {
+              return pGender === 'men' || pGender === 'male' || pGender === 'unisex';
+            }
+            if (tg === 'women' || tg === 'female' || tg === 'woman') {
+              return pGender === 'women' || pGender === 'female' || pGender === 'unisex';
+            }
+            return pGender === tg;
+          });
+        });
       }
 
       if (req.query.colors) {
@@ -242,7 +253,20 @@ router.get('/', async (req, res, next) => {
     }
 
     if (req.query.gender) {
-      query.gender = new RegExp(`^${req.query.gender.trim()}$`, 'i');
+      const targetGenders = req.query.gender.split(',').map(g => g.trim().toLowerCase());
+      const genderRegexes = [];
+
+      targetGenders.forEach(tg => {
+        if (tg === 'men' || tg === 'male' || tg === 'man') {
+          genderRegexes.push(/^Men$/i, /^Male$/i, /^Unisex$/i);
+        } else if (tg === 'women' || tg === 'female' || tg === 'woman') {
+          genderRegexes.push(/^Women$/i, /^Female$/i, /^Unisex$/i);
+        } else {
+          genderRegexes.push(new RegExp(`^${tg}$`, 'i'));
+        }
+      });
+
+      query.gender = { $in: genderRegexes };
     }
 
     if (req.query.colors) {
