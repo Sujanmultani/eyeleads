@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Trash2, ShoppingBag, CheckCircle, AlertTriangle, ArrowRight, UploadCloud, Sparkles, ChevronRight, Gift } from 'lucide-react';
+import { Trash2, ShoppingBag, CheckCircle, AlertTriangle, ArrowRight, UploadCloud, Sparkles, ChevronRight, Gift, Check } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import api from '../utils/api';
 import { toast } from '../components/Toast';
@@ -495,6 +495,54 @@ const Cart = () => {
                   <span>₹{finalTotal.toLocaleString('en-IN')}</span>
                 </div>
               </div>
+
+              {/* 1-Click Lens Cleaning Kit Add Option */}
+              {(() => {
+                const isCleaningKitInCart = cartItems.some(
+                  item => (item.product._id || item.product.id) === '6a3c5d6e7f8a9b0c1d2e3f4b' || item.product.name?.toLowerCase().includes('cleaning')
+                );
+
+                if (isCleaningKitInCart) {
+                  return (
+                    <div className="p-3 rounded-xl border border-green-200 bg-green-50/60 flex items-center justify-between gap-2 text-xs font-bold text-green-700">
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-green-600 shrink-0" />
+                        <span>Lens Cleaning Kit Included</span>
+                      </span>
+                      <span className="text-[11px] font-extrabold bg-white px-2 py-0.5 rounded border border-green-200">₹299</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 flex items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Sparkles className="h-4 w-4 text-[#B8952A] shrink-0" />
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-extrabold text-[#1A1A2E] truncate">Add Lens Cleaning Kit</h4>
+                        <span className="text-[11px] text-slate-500 font-semibold block truncate">Spray & Microfiber Cloth (+₹299)</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToCart({
+                          _id: '6a3c5d6e7f8a9b0c1d2e3f4b',
+                          id: '6a3c5d6e7f8a9b0c1d2e3f4b',
+                          name: 'Eco-Friendly Lens Cleaning Kit',
+                          price: 299,
+                          category: 'Accessories',
+                          image: '/uploads/lens-cleaning-kit.png'
+                        }, 1, { lensType: 'Non-Prescription' });
+                        toast.success('Lens Cleaning Kit added to your cart!');
+                      }}
+                      className="bg-[#B8952A] hover:bg-amber-600 text-white font-extrabold text-[11px] uppercase tracking-wider px-3.5 py-2 rounded-xl cursor-pointer transition-all shrink-0 active:scale-95 shadow-xs"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                );
+              })()}
 
               {/* Coupon forms */}
               <div className="space-y-2 pt-2 border-t border-slate-100">
