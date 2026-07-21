@@ -59,16 +59,11 @@ const ShippingReturns = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   <tr>
-                    <td className="py-3.5 px-4 font-bold text-slate-700">Below ₹999</td>
-                    <td className="py-3.5 px-4">5–7 Business Days</td>
-                    <td className="py-3.5 px-4 text-right font-black text-[#0F2744]">₹99</td>
-                  </tr>
-                  <tr className="bg-slate-50/10">
-                    <td className="py-3.5 px-4 font-bold text-slate-700">₹999 & Above</td>
+                    <td className="py-3.5 px-4 font-bold text-slate-700">All Orders</td>
                     <td className="py-3.5 px-4">5–7 Business Days</td>
                     <td className="py-3.5 px-4 text-right font-black text-green-600">FREE Express</td>
                   </tr>
-                  <tr>
+                  <tr className="bg-slate-50/10">
                     <td className="py-3.5 px-4 font-bold text-[#0F2744]">Prescription Lenses</td>
                     <td className="py-3.5 px-4 text-amber-600 font-semibold">Add 3–5 Days for Lens Cutting & Optometry verification</td>
                     <td className="py-3.5 px-4 text-right font-black text-green-600">FREE Express</td>

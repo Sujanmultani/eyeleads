@@ -126,7 +126,7 @@ router.post('/', protect, async (req, res, next) => {
         mockDiscount = Number(req.body.discountPrice) || 0;
       }
 
-      const calculatedShippingPrice = mockSubtotal > 999 ? 0 : 99;
+      const calculatedShippingPrice = 0;
       const taxPrice = 0;
       const calculatedTotalPrice = mockSubtotal + calculatedShippingPrice + taxPrice - mockDiscount;
       const mockId = `mock-order-${Date.now()}`;
@@ -263,8 +263,8 @@ router.post('/', protect, async (req, res, next) => {
       }
     }
 
-    // Include calculated lens charges and shipping bounds
-    const calculatedShippingPrice = dbSubtotal > 999 ? 0 : 99;
+    // Include calculated lens charges and shipping bounds (FREE SHIPPING FOR ALL ORDERS)
+    const calculatedShippingPrice = 0;
     const taxPrice = 0;
     const calculatedTotalPrice = dbSubtotal + calculatedShippingPrice + taxPrice - discountPrice;
 

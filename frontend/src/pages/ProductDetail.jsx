@@ -628,8 +628,8 @@ const ProductDetail = () => {
 
     // 3. Assemble and map Checkout state payloads
     const subtotal = calculateBundleTotal();
-    const deliveryCharge = subtotal > 999 ? 0 : 99;
-    const finalTotal = subtotal + deliveryCharge;
+    const deliveryCharge = 0;
+    const finalTotal = subtotal;
 
     const mainCheckoutItem = {
       product: {
