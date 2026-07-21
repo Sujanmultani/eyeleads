@@ -1874,11 +1874,42 @@ const Admin = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setIsAddModalOpen(true)}
+                          onClick={() => {
+                            setProductForm({
+                              name: '',
+                              brand: 'EyeLeads Care',
+                              category: 'Cleaning Kits',
+                              frameShape: 'Standard',
+                              material: 'Standard',
+                              gender: 'Unisex',
+                              colors: ['Default'],
+                              price: 299,
+                              mrp: 399,
+                              discount: 25,
+                              image: '',
+                              description: 'Premium anti-fog lens cleaning spray & microfiber cleaning cloth kit.',
+                              inStock: true,
+                              inventoryCount: 100,
+                              tryOnAssets: { frontPng: '', anglePng: '', frameWidthMm: 138 }
+                            });
+                            setIsAddModalOpen(true);
+                          }}
+                          className="bg-[#B8952A] hover:bg-amber-600 text-white font-extrabold text-xxs uppercase tracking-widest py-3 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm active-scale-premium transition-all"
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span>+ Add Cleaning Kit</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            resetProductForm();
+                            setIsAddModalOpen(true);
+                          }}
                           className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xxs uppercase tracking-widest py-3 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow active-scale-premium transition-all"
                         >
                           <Plus className="h-4 w-4" />
-                          <span>Add New Frame</span>
+                          <span>+ Add Product</span>
                         </button>
                       </>
                     )}
