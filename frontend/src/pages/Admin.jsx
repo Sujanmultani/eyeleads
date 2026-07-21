@@ -748,11 +748,19 @@ const Admin = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/products', productForm);
+      const payload = { ...productForm };
+      if (payload.category === 'Cleaning Kits') {
+        payload.isCleaningKit = true;
+        payload.frameShape = payload.frameShape || 'Standard';
+        payload.material = payload.material || 'Standard';
+        payload.gender = payload.gender || 'Unisex';
+        if (!payload.colors || payload.colors.length === 0) payload.colors = ['Default'];
+      }
+      const response = await api.post('/api/products', payload);
       setProducts([response.data.product, ...products]);
       setIsAddModalOpen(false);
       resetProductForm();
-      toast.success('Product created successfully!');
+      toast.success(payload.category === 'Cleaning Kits' ? 'Cleaning Kit added successfully!' : 'Product created successfully!');
     } catch (err) {
       console.error('Error creating product:', err);
       toast.error(err.response?.data?.message || 'Failed to create product. Please check your connection.');
@@ -798,12 +806,20 @@ const Admin = () => {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.put(`/api/products/${selectedProduct._id}`, productForm);
+      const payload = { ...productForm };
+      if (payload.category === 'Cleaning Kits') {
+        payload.isCleaningKit = true;
+        payload.frameShape = payload.frameShape || 'Standard';
+        payload.material = payload.material || 'Standard';
+        payload.gender = payload.gender || 'Unisex';
+        if (!payload.colors || payload.colors.length === 0) payload.colors = ['Default'];
+      }
+      const response = await api.put(`/api/products/${selectedProduct._id}`, payload);
       setProducts(products.map(p => p._id === selectedProduct._id ? response.data.product : p));
       setIsEditDrawerOpen(false);
       setSelectedProduct(null);
       resetProductForm();
-      toast.success('Product updated successfully!');
+      toast.success(payload.category === 'Cleaning Kits' ? 'Cleaning kit updated successfully!' : 'Product updated successfully!');
     } catch (err) {
       console.error('Error updating product:', err);
       toast.error(err.response?.data?.message || 'Failed to update product. Please check your connection.');
@@ -1862,6 +1878,34 @@ const Admin = () => {
                           {isBulkSaving ? 'Saving...' : 'Save Weights'}
                         </button>
                       </>
+                    ) : productSubTab === 'kits' ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductForm({
+                            name: '',
+                            brand: 'EyeLeads Care',
+                            category: 'Cleaning Kits',
+                            frameShape: 'Standard',
+                            material: 'Standard',
+                            gender: 'Unisex',
+                            colors: ['Default'],
+                            price: 299,
+                            mrp: 399,
+                            discount: 25,
+                            image: '',
+                            description: 'Premium anti-fog lens cleaning spray & microfiber cleaning cloth kit.',
+                            inStock: true,
+                            inventoryCount: 100,
+                            tryOnAssets: { frontPng: '', anglePng: '', frameWidthMm: 138 }
+                          });
+                          setIsAddModalOpen(true);
+                        }}
+                        className="bg-[#B8952A] hover:bg-amber-600 text-white font-extrabold text-xs uppercase tracking-wider py-3 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm active-scale-premium transition-all"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>+ Add Cleaning Kit</span>
+                      </button>
                     ) : (
                       <>
                         <button
@@ -1875,41 +1919,13 @@ const Admin = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            setProductForm({
-                              name: '',
-                              brand: 'EyeLeads Care',
-                              category: 'Cleaning Kits',
-                              frameShape: 'Standard',
-                              material: 'Standard',
-                              gender: 'Unisex',
-                              colors: ['Default'],
-                              price: 299,
-                              mrp: 399,
-                              discount: 25,
-                              image: '',
-                              description: 'Premium anti-fog lens cleaning spray & microfiber cleaning cloth kit.',
-                              inStock: true,
-                              inventoryCount: 100,
-                              tryOnAssets: { frontPng: '', anglePng: '', frameWidthMm: 138 }
-                            });
-                            setIsAddModalOpen(true);
-                          }}
-                          className="bg-[#B8952A] hover:bg-amber-600 text-white font-extrabold text-xxs uppercase tracking-widest py-3 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm active-scale-premium transition-all"
-                        >
-                          <Plus className="h-4 w-4" />
-                          <span>+ Add Cleaning Kit</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
                             resetProductForm();
                             setIsAddModalOpen(true);
                           }}
-                          className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xxs uppercase tracking-widest py-3 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow active-scale-premium transition-all"
+                          className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xs uppercase tracking-wider py-3 px-6 rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow active-scale-premium transition-all"
                         >
                           <Plus className="h-4 w-4" />
-                          <span>+ Add Product</span>
+                          <span>+ Add Eyewear Frame</span>
                         </button>
                       </>
                     )}
@@ -3834,129 +3850,211 @@ const Admin = () => {
 
             <div className="space-y-1">
               <span className="text-gold-accent text-[9px] font-extrabold uppercase tracking-widest block">EyeLeads Creator</span>
-              <h3 className="text-xl font-light font-serif text-navy-dark">Create Premium Product Frame</h3>
+              <h3 className="text-xl font-light font-serif text-navy-dark">
+                {productForm.category === 'Cleaning Kits' ? 'Add New Cleaning Kit' : 'Create Premium Product Frame'}
+              </h3>
             </div>
 
             <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold text-text-muted">
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Frame Name</label>
-                <input
-                  type="text"
-                  required
-                  value={productForm.name}
-                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  placeholder="e.g. Zephyr Titanium Round"
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary"
-                />
-              </div>
+              {productForm.category === 'Cleaning Kits' ? (
+                <>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="uppercase tracking-wider text-[9px]">Cleaning Kit Title / Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={productForm.name}
+                      onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                      placeholder="e.g. Eco-Friendly Lens Cleaning Kit (Spray & Cloth)"
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary font-bold text-xs"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Brand Tier</label>
-                <select
-                  value={productForm.brand}
-                  onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                >
-                  <option value="EyeLeads Classic">EyeLeads Classic</option>
-                  <option value="EyeLeads Bold">EyeLeads Bold</option>
-                  <option value="EyeLeads Flexx">EyeLeads Flexx</option>
-                  <option value="EyeLeads Apex">EyeLeads Apex</option>
-                  <option value="EyeLeads Craft">EyeLeads Craft</option>
-                </select>
-              </div>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Selling Price (INR ₹)</label>
+                    <input
+                      type="number"
+                      required
+                      value={productForm.price}
+                      onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                      placeholder="e.g. 299"
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Lens Category</label>
-                <select
-                  value={productForm.category}
-                  onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                >
-                  <option value="Eyeglasses">Eyeglasses</option>
-                  <option value="Sunglasses">Sunglasses</option>
-                  <option value="Computer Glasses">Computer Glasses</option>
-                  <option value="Sports">Sports</option>
-                  <option value="Kids">Kids</option>
-                  <option value="Accessories">Accessories</option>
-                  <option value="Cleaning Kits">Cleaning Kits</option>
-                </select>
-              </div>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR ₹)</label>
+                    <input
+                      type="number"
+                      required
+                      value={productForm.mrp}
+                      onChange={(e) => setProductForm({ ...productForm, mrp: Number(e.target.value) })}
+                      placeholder="e.g. 399"
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Geometric Shape</label>
-                <select
-                  value={productForm.frameShape}
-                  onChange={(e) => setProductForm({ ...productForm, frameShape: e.target.value })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                >
-                  <option value="Round">Round</option>
-                  <option value="Square">Square</option>
-                  <option value="Aviator">Aviator</option>
-                  <option value="Cat-Eye">Cat-Eye</option>
-                  <option value="Rectangle">Rectangle</option>
-                  <option value="Wayfarer">Wayfarer</option>
-                  <option value="Oval">Oval</option>
-                </select>
-              </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="uppercase tracking-wider text-[9px]">Product Image (Upload File or URL)</label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        required
+                        value={productForm.image}
+                        onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                        placeholder="Paste image URL or upload file..."
+                        className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="cleaning-kit-file-upload-add"
+                        onChange={handlePrimaryImageUpload}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="cleaning-kit-file-upload-add"
+                        className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xs uppercase px-4 py-3 rounded-xl cursor-pointer shrink-0 transition-colors"
+                      >
+                        Upload Image
+                      </label>
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Material Matrix</label>
-                <input
-                  type="text"
-                  required
-                  value={productForm.material}
-                  onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
-                  list="materials-list-add"
-                  placeholder="e.g. Acetate, Carbon Fiber"
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary text-xs font-bold"
-                />
-                <datalist id="materials-list-add">
-                  <option value="Acetate" />
-                  <option value="Titanium" />
-                  <option value="Metal" />
-                  <option value="TR90" />
-                  <option value="Wood" />
-                </datalist>
-              </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="uppercase tracking-wider text-[9px]">Kit Description (Optional)</label>
+                    <textarea
+                      rows="3"
+                      value={productForm.description}
+                      onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                      placeholder="e.g. Premium anti-fog lens cleaning spray with high-density microfiber cleaning cloth."
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-medium"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Frame Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={productForm.name}
+                      onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                      placeholder="e.g. Zephyr Titanium Round"
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Gender Target</label>
-                <select
-                  value={productForm.gender}
-                  onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                >
-                  <option value="Men">Men</option>
-                  <option value="Women">Women</option>
-                  <option value="Unisex">Unisex</option>
-                  <option value="Kids">Kids</option>
-                </select>
-              </div>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Brand Tier</label>
+                    <select
+                      value={productForm.brand}
+                      onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                    >
+                      <option value="EyeLeads Classic">EyeLeads Classic</option>
+                      <option value="EyeLeads Bold">EyeLeads Bold</option>
+                      <option value="EyeLeads Flexx">EyeLeads Flexx</option>
+                      <option value="EyeLeads Apex">EyeLeads Apex</option>
+                      <option value="EyeLeads Craft">EyeLeads Craft</option>
+                    </select>
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Base Frame Price (INR)</label>
-                <input
-                  type="number"
-                  required
-                  disabled={productForm.onSale}
-                  value={productForm.price}
-                  onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-75 disabled:bg-slate-100/50 text-xs font-bold"
-                  title={productForm.onSale ? "Calculated automatically when On Sale is enabled" : ""}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Lens Category</label>
+                    <select
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                    >
+                      <option value="Eyeglasses">Eyeglasses</option>
+                      <option value="Sunglasses">Sunglasses</option>
+                      <option value="Computer Glasses">Computer Glasses</option>
+                      <option value="Sports">Sports</option>
+                      <option value="Kids">Kids</option>
+                      <option value="Accessories">Accessories</option>
+                      <option value="Cleaning Kits">Cleaning Kits</option>
+                    </select>
+                  </div>
 
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR)</label>
-                <input
-                  type="number"
-                  required
-                  value={productForm.mrp}
-                  onChange={(e) => setProductForm({ ...productForm, mrp: Number(e.target.value) })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Geometric Shape</label>
+                    <select
+                      value={productForm.frameShape}
+                      onChange={(e) => setProductForm({ ...productForm, frameShape: e.target.value })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                    >
+                      <option value="Round">Round</option>
+                      <option value="Square">Square</option>
+                      <option value="Aviator">Aviator</option>
+                      <option value="Cat-Eye">Cat-Eye</option>
+                      <option value="Rectangle">Rectangle</option>
+                      <option value="Wayfarer">Wayfarer</option>
+                      <option value="Oval">Oval</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Material Matrix</label>
+                    <input
+                      type="text"
+                      required
+                      value={productForm.material}
+                      onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
+                      list="materials-list-add"
+                      placeholder="e.g. Acetate, Carbon Fiber"
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary text-xs font-bold"
+                    />
+                    <datalist id="materials-list-add">
+                      <option value="Acetate" />
+                      <option value="Titanium" />
+                      <option value="Metal" />
+                      <option value="TR90" />
+                      <option value="Wood" />
+                    </datalist>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Gender Target</label>
+                    <select
+                      value={productForm.gender}
+                      onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                    >
+                      <option value="Men">Men</option>
+                      <option value="Women">Women</option>
+                      <option value="Unisex">Unisex</option>
+                      <option value="Kids">Kids</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">Base Frame Price (INR)</label>
+                    <input
+                      type="number"
+                      required
+                      disabled={productForm.onSale}
+                      value={productForm.price}
+                      onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-75 disabled:bg-slate-100/50 text-xs font-bold"
+                      title={productForm.onSale ? "Calculated automatically when On Sale is enabled" : ""}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR)</label>
+                    <input
+                      type="number"
+                      required
+                      value={productForm.mrp}
+                      onChange={(e) => setProductForm({ ...productForm, mrp: Number(e.target.value) })}
+                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="space-y-2">
                 <label className="uppercase tracking-wider text-[9px]">Discount Percentage (%)</label>
@@ -4417,7 +4515,7 @@ const Admin = () => {
                   type="submit"
                   className="px-6 py-3 rounded-xl bg-navy-dark text-white hover:bg-gold-accent hover:text-navy-dark text-[10px] font-extrabold uppercase tracking-widest cursor-pointer shadow transition-colors"
                 >
-                  Insert Frame
+                  {productForm.category === 'Cleaning Kits' ? 'Publish Cleaning Kit' : 'Publish Eyewear Frame'}
                 </button>
               </div>
 
