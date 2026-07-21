@@ -3832,16 +3832,16 @@ const Admin = () => {
               </div>
             )}
 
-
           </div>
         )}
       </main>
 
-      {/* 5. ADD FRAME MODAL OVERLAY */}
+      {/* 5. ADD FRAME / CLEANING KIT MODAL OVERLAY */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0F2744]/75 backdrop-blur-sm flex items-center justify-center p-4 select-none animate-fadeIn">
-          <div className="bg-white rounded-[32px] w-full max-w-2xl overflow-hidden border border-slate-200 shadow-luxury space-y-6 p-8 relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] bg-[#0F2744]/80 backdrop-blur-md flex items-center justify-center p-4 select-none animate-fadeIn overflow-y-auto">
+          <div className="bg-white rounded-[32px] w-full max-w-xl overflow-hidden border border-slate-200 shadow-luxury space-y-6 p-6 sm:p-8 relative my-auto max-h-[90vh] overflow-y-auto">
             <button
+              type="button"
               onClick={() => { setIsAddModalOpen(false); resetProductForm(); }}
               className="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-navy-primary hover:bg-slate-50 transition-colors"
             >
@@ -3855,24 +3855,23 @@ const Admin = () => {
               </h3>
             </div>
 
-            <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold text-text-muted">
+            {productForm.category === 'Cleaning Kits' ? (
+              <form onSubmit={handleAddProduct} className="space-y-4 text-xs font-bold text-text-muted">
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px] block text-slate-600">Cleaning Kit Title / Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    placeholder="e.g. Eco-Friendly Lens Cleaning Kit (Spray & Cloth)"
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary font-bold text-xs"
+                  />
+                </div>
 
-              {productForm.category === 'Cleaning Kits' ? (
-                <>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="uppercase tracking-wider text-[9px]">Cleaning Kit Title / Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={productForm.name}
-                      onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                      placeholder="e.g. Eco-Friendly Lens Cleaning Kit (Spray & Cloth)"
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary font-bold text-xs"
-                    />
-                  </div>
-
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Selling Price (INR ₹)</label>
+                    <label className="uppercase tracking-wider text-[9px] block text-slate-600">Selling Price (INR ₹)</label>
                     <input
                       type="number"
                       required
@@ -3884,7 +3883,7 @@ const Admin = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR ₹)</label>
+                    <label className="uppercase tracking-wider text-[9px] block text-slate-600">MRP Comparison Price (INR ₹)</label>
                     <input
                       type="number"
                       required
@@ -3894,632 +3893,277 @@ const Admin = () => {
                       className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
                     />
                   </div>
+                </div>
 
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="uppercase tracking-wider text-[9px]">Product Image (Upload File or URL)</label>
-                    <div className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        required
-                        value={productForm.image}
-                        onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                        placeholder="Paste image URL or upload file..."
-                        className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
-                      />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        id="cleaning-kit-file-upload-add"
-                        onChange={handlePrimaryImageUpload}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="cleaning-kit-file-upload-add"
-                        className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xs uppercase px-4 py-3 rounded-xl cursor-pointer shrink-0 transition-colors"
-                      >
-                        Upload Image
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="uppercase tracking-wider text-[9px]">Kit Description (Optional)</label>
-                    <textarea
-                      rows="3"
-                      value={productForm.description}
-                      onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                      placeholder="e.g. Premium anti-fog lens cleaning spray with high-density microfiber cleaning cloth."
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-medium"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Frame Name</label>
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px] block text-slate-600">Product Image (Upload File or URL)</label>
+                  <div className="flex gap-2 items-center">
                     <input
                       type="text"
                       required
-                      value={productForm.name}
-                      onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                      placeholder="e.g. Zephyr Titanium Round"
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Brand Tier</label>
-                    <select
-                      value={productForm.brand}
-                      onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                    >
-                      <option value="EyeLeads Classic">EyeLeads Classic</option>
-                      <option value="EyeLeads Bold">EyeLeads Bold</option>
-                      <option value="EyeLeads Flexx">EyeLeads Flexx</option>
-                      <option value="EyeLeads Apex">EyeLeads Apex</option>
-                      <option value="EyeLeads Craft">EyeLeads Craft</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Lens Category</label>
-                    <select
-                      value={productForm.category}
-                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                    >
-                      <option value="Eyeglasses">Eyeglasses</option>
-                      <option value="Sunglasses">Sunglasses</option>
-                      <option value="Computer Glasses">Computer Glasses</option>
-                      <option value="Sports">Sports</option>
-                      <option value="Kids">Kids</option>
-                      <option value="Accessories">Accessories</option>
-                      <option value="Cleaning Kits">Cleaning Kits</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Geometric Shape</label>
-                    <select
-                      value={productForm.frameShape}
-                      onChange={(e) => setProductForm({ ...productForm, frameShape: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                    >
-                      <option value="Round">Round</option>
-                      <option value="Square">Square</option>
-                      <option value="Aviator">Aviator</option>
-                      <option value="Cat-Eye">Cat-Eye</option>
-                      <option value="Rectangle">Rectangle</option>
-                      <option value="Wayfarer">Wayfarer</option>
-                      <option value="Oval">Oval</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Material Matrix</label>
-                    <input
-                      type="text"
-                      required
-                      value={productForm.material}
-                      onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
-                      list="materials-list-add"
-                      placeholder="e.g. Acetate, Carbon Fiber"
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary text-xs font-bold"
-                    />
-                    <datalist id="materials-list-add">
-                      <option value="Acetate" />
-                      <option value="Titanium" />
-                      <option value="Metal" />
-                      <option value="TR90" />
-                      <option value="Wood" />
-                    </datalist>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Gender Target</label>
-                    <select
-                      value={productForm.gender}
-                      onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
-                    >
-                      <option value="Men">Men</option>
-                      <option value="Women">Women</option>
-                      <option value="Unisex">Unisex</option>
-                      <option value="Kids">Kids</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">Base Frame Price (INR)</label>
-                    <input
-                      type="number"
-                      required
-                      disabled={productForm.onSale}
-                      value={productForm.price}
-                      onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-75 disabled:bg-slate-100/50 text-xs font-bold"
-                      title={productForm.onSale ? "Calculated automatically when On Sale is enabled" : ""}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR)</label>
-                    <input
-                      type="number"
-                      required
-                      value={productForm.mrp}
-                      onChange={(e) => setProductForm({ ...productForm, mrp: Number(e.target.value) })}
+                      value={productForm.image}
+                      onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                      placeholder="Paste image URL or upload image..."
                       className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
                     />
-                  </div>
-                </>
-              )}
-
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Discount Percentage (%)</label>
-                <input
-                  type="number"
-                  required
-                  disabled={!productForm.onSale}
-                  value={productForm.discount || 0}
-                  onChange={(e) => setProductForm({ ...productForm, discount: Number(e.target.value) })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-50 text-xs font-bold"
-                  placeholder="e.g. 10 for 10% off"
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <label className="uppercase tracking-wider text-[9px]">Eyewear Product Warranty Terms (e.g. 1-Year Warranty)</label>
-                <input
-                  type="text"
-                  required
-                  value={productForm.warranty || ''}
-                  onChange={(e) => setProductForm({ ...productForm, warranty: e.target.value })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary"
-                  placeholder="e.g. 1-Year Warranty"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Product Weight (Grams)</label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  value={productForm.weightGrams}
-                  onChange={(e) => setProductForm({ ...productForm, weightGrams: Number(e.target.value) })}
-                  className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
-                  placeholder="e.g. 250"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="uppercase tracking-wider text-[9px]">Weight Tier Classification</label>
-                <div className="w-full border border-slate-200 rounded-xl px-4 py-3 bg-slate-50/50 text-xs font-extrabold flex items-center justify-between min-h-[46px]">
-                  {(() => {
-                    const w = productForm.weightGrams || 0;
-                    if (w < 200) {
-                      return (
-                        <>
-                          <span className="text-emerald-600">Light Weight Tier</span>
-                          <span className="text-slate-400 font-bold">Avg. Shipping: ~₹80</span>
-                        </>
-                      );
-                    } else if (w <= 500) {
-                      return (
-                        <>
-                          <span className="text-[#B8952A]">Medium Weight Tier</span>
-                          <span className="text-slate-400 font-bold">Avg. Shipping: ~₹120</span>
-                        </>
-                      );
-                    } else {
-                      return (
-                        <>
-                          <span className="text-rose-600">Heavy Weight Tier</span>
-                          <span className="text-slate-400 font-bold">Avg. Shipping: ~₹160</span>
-                        </>
-                      );
-                    }
-                  })()}
-                </div>
-              </div>
-
-              {/* Product Showcase Video Upload & Config */}
-              <div className="space-y-2 md:col-span-2 border-t border-slate-100 pt-4">
-                <span className="text-[#B8952A] text-[9px] font-extrabold uppercase tracking-widest block">Product Video Showcase (Optional)</span>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[8px] block text-slate-500">Video Link / URL</label>
-                    <input
-                      type="text"
-                      value={productForm.videoUrl || ''}
-                      onChange={(e) => setProductForm({ ...productForm, videoUrl: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs"
-                      placeholder="Paste MP4 video link or upload below..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[8px] block text-slate-500">Video Thumbnail Override URL</label>
-                    <input
-                      type="text"
-                      value={productForm.videoThumbnail || ''}
-                      onChange={(e) => setProductForm({ ...productForm, videoThumbnail: e.target.value })}
-                      className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs"
-                      placeholder="Paste thumbnail image URL..."
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 pt-2">
-                  <label className="uppercase tracking-wider text-[8px] block text-slate-500">Upload Video File (Drag & Drop)</label>
-                  <div
-                    onDragEnter={handleProductVideoDrag}
-                    onDragOver={handleProductVideoDrag}
-                    onDragLeave={handleProductVideoDrag}
-                    onDrop={handleProductVideoDrop}
-                    className={`w-full min-h-[90px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-3 text-center transition-all duration-300 relative ${
-                      productVideoDragActive
-                        ? 'border-gold-accent bg-gold-accent/5 scale-[1.01]'
-                        : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50 hover:border-gold-accent/50'
-                    }`}
-                  >
                     <input
                       type="file"
-                      accept="video/*"
-                      onChange={async (e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          await uploadProductVideo(e.target.files[0]);
-                        }
-                      }}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      accept="image/*"
+                      id="cleaning-kit-file-upload-add"
+                      onChange={handlePrimaryImageUpload}
+                      className="hidden"
                     />
-                    {productVideoUploading ? (
-                      <div className="flex flex-col items-center gap-1.5 text-slate-400">
-                        <Loader className="h-5 w-5 animate-spin text-gold-accent" />
-                        <p className="text-[9px] font-black uppercase tracking-wider text-[#B8952A]">Uploading video...</p>
-                      </div>
-                    ) : productForm.videoUrl ? (
-                      <div className="flex items-center gap-3 w-full pr-6 relative z-0">
-                        <video src={productForm.videoUrl} className="w-10 h-10 rounded-lg object-cover border border-slate-200" muted />
-                        <div className="text-left min-w-0 flex-1">
-                          <p className="text-[10px] font-bold text-navy-dark truncate">{productForm.videoUrl}</p>
-                          <p className="text-[8px] text-[#B8952A] uppercase tracking-wider mt-0.5">Drag new video to replace</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setProductForm(prev => ({ ...prev, videoUrl: '' }));
-                          }}
-                          className="px-2.5 py-1 text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded text-[9px] uppercase tracking-wider font-extrabold cursor-pointer"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 text-slate-500">
-                        <Plus className="h-5 w-5 text-gold-accent" />
-                        <p className="text-[9.5px] font-extrabold text-navy-dark leading-none">Drop video here, or click to upload</p>
-                      </div>
-                    )}
+                    <label
+                      htmlFor="cleaning-kit-file-upload-add"
+                      className="bg-navy-dark hover:bg-[#1B3F6E] text-white font-extrabold text-xs uppercase px-4 py-3 rounded-xl cursor-pointer shrink-0 transition-colors"
+                    >
+                      {imageUploading ? 'Uploading...' : 'Upload'}
+                    </label>
                   </div>
-                </div>
-              </div>
-
-              {/* Virtual Try-On Assets Upload (Lenskart AR) */}
-              <div className="space-y-3 md:col-span-2 border-t border-slate-100 pt-4">
-                <span className="text-[#B8952A] text-[9px] font-extrabold uppercase tracking-widest block">Virtual Try-On AR Assets (Optional)</span>
-                <p className="text-[10px] text-slate-400 font-semibold">Upload transparent PNG frame cuts to enable Lenskart-style real-time 3D Try-On.</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Front PNG Upload */}
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[8px] block text-slate-500">Try-On Front Photo (Transparent PNG)</label>
-                    <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                      <div className="flex-1 min-w-0">
-                        {productForm.tryOnAssets?.frontPng ? (
-                          <div className="flex items-center gap-2">
-                            <img src={productForm.tryOnAssets.frontPng} alt="Try-On Front Asset" className="w-10 h-10 object-contain bg-slate-200 rounded border border-slate-300" />
-                            <p className="text-[9.5px] text-navy-dark font-mono truncate">{productForm.tryOnAssets.frontPng}</p>
-                          </div>
-                        ) : (
-                          <p className="text-[9.5px] text-slate-400 italic">No front photo uploaded</p>
-                        )}
-                      </div>
-                      <div className="relative shrink-0">
-                        <input
-                          type="file"
-                          accept="image/png"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              uploadTryOnAsset(e.target.files[0], 'front');
-                            }
-                          }}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                        <button
-                          type="button"
-                          disabled={tryOnUploading.front}
-                          className="px-3 py-1.5 bg-[#1B3F6E] text-white text-[9.5px] font-extrabold uppercase tracking-wider rounded-lg shadow-sm hover:bg-[#B8952A]"
-                        >
-                          {tryOnUploading.front ? 'Uploading...' : 'Upload Front'}
-                        </button>
-                      </div>
+                  {productForm.image && (
+                    <div className="mt-2 h-24 w-28 rounded-xl border border-slate-200 overflow-hidden bg-slate-100 p-1">
+                      <img src={productForm.image} alt="Preview" className="w-full h-full object-contain" />
                     </div>
-                    <p className="text-[8px] text-slate-400 leading-normal">Straight-on view of the glasses only, background removed.</p>
-                  </div>
-
-                  {/* Angled PNG Upload */}
-                  <div className="space-y-2">
-                    <label className="uppercase tracking-wider text-[8px] block text-slate-500">Try-On Angled Photo (Transparent PNG)</label>
-                    <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                      <div className="flex-1 min-w-0">
-                        {productForm.tryOnAssets?.anglePng ? (
-                          <div className="flex items-center gap-2">
-                            <img src={productForm.tryOnAssets.anglePng} alt="Try-On Angled Asset" className="w-10 h-10 object-contain bg-slate-200 rounded border border-slate-300" />
-                            <p className="text-[9.5px] text-navy-dark font-mono truncate">{productForm.tryOnAssets.anglePng}</p>
-                          </div>
-                        ) : (
-                          <p className="text-[9.5px] text-slate-400 italic">No angled photo uploaded</p>
-                        )}
-                      </div>
-                      <div className="relative shrink-0">
-                        <input
-                          type="file"
-                          accept="image/png"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              uploadTryOnAsset(e.target.files[0], 'angle');
-                            }
-                          }}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                        <button
-                          type="button"
-                          disabled={tryOnUploading.angle}
-                          className="px-3 py-1.5 bg-[#1B3F6E] text-white text-[9.5px] font-extrabold uppercase tracking-wider rounded-lg shadow-sm hover:bg-[#B8952A]"
-                        >
-                          {tryOnUploading.angle ? 'Uploading...' : 'Upload Angled'}
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-[8px] text-slate-400 leading-normal">3/4 angle shot of the same glasses, background removed.</p>
-                  </div>
+                  )}
                 </div>
 
-                {/* Frame Width Input */}
-                <div className="w-full sm:w-1/2 pt-2">
-                  <label className="uppercase tracking-wider text-[8.5px] block text-slate-500 mb-1">Real-World Frame Width (mm)</label>
-                  <input
-                    type="number"
-                    value={productForm.tryOnAssets?.frameWidthMm || 138}
-                    onChange={(e) => setProductForm({
-                      ...productForm,
-                      tryOnAssets: {
-                        ...productForm.tryOnAssets,
-                        frameWidthMm: Number(e.target.value) || 138
-                      }
-                    })}
-                    placeholder="e.g. 138"
-                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-2.5 bg-slate-50/50 focus:bg-white text-text-primary text-xs font-bold"
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px] block text-slate-600">Description (Optional)</label>
+                  <textarea
+                    rows="3"
+                    value={productForm.description}
+                    onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                    placeholder="e.g. Premium anti-fog lens cleaning spray with high-density microfiber cleaning cloth."
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-medium"
                   />
-                  <p className="text-[8px] text-slate-400 leading-normal mt-1">Real width of the frame in millimeters (temple-to-temple). Used to scale the virtual frame precisely to the wearer's face.</p>
                 </div>
-              </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <label className="uppercase tracking-wider text-[9px] block">Color Options (Add multiple)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="new-color-input-add"
-                    placeholder="Enter color (e.g., Gold, Black, Tortoise)"
-                    className="flex-grow border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = e.target.value.trim();
-                        if (val && !productForm.colors.includes(val)) {
-                          setProductForm({
-                            ...productForm,
-                            colors: [...productForm.colors, val]
-                          });
-                          e.target.value = '';
-                        }
-                      }
-                    }}
-                  />
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                   <button
                     type="button"
-                    onClick={() => {
-                      const input = document.getElementById('new-color-input-add');
-                      const val = input.value.trim();
-                      if (val && !productForm.colors.includes(val)) {
-                        setProductForm({
-                          ...productForm,
-                          colors: [...productForm.colors, val]
-                        });
-                        input.value = '';
-                      }
-                    }}
-                    className="bg-navy-dark text-white px-4 py-3 rounded-xl text-xxs font-extrabold uppercase tracking-widest hover:bg-[#1B3F6E] transition-all cursor-pointer"
+                    onClick={() => { setIsAddModalOpen(false); resetProductForm(); }}
+                    className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer"
                   >
-                    Add
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-xl bg-[#B8952A] text-white hover:bg-amber-600 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer shadow transition-colors"
+                  >
+                    Publish Cleaning Kit
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {productForm.colors.map((color, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1 rounded-full bg-slate-100 text-[#4A4A6A] text-[9.5px] font-extrabold uppercase tracking-wider border border-slate-200/40 flex items-center gap-1.5"
-                    >
-                      <span>{color}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setProductForm({
-                            ...productForm,
-                            colors: productForm.colors.filter((_, i) => i !== idx)
-                          });
-                        }}
-                        className="text-slate-400 hover:text-rose-600 transition-colors"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
-                  {productForm.colors.length === 0 && (
-                    <span className="text-[10px] text-slate-400 italic">No colors added yet (default is Black)</span>
-                  )}
-                </div>
-              </div>
+              </form>
+            ) : (
+              <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold text-text-muted">
 
-              <div className="space-y-2 md:col-span-2">
-                <label className="uppercase tracking-wider text-[9px]">Eyewear Frame Images (Drag & Drop • Max 5)</label>
-
-                {/* Drag and Drop Zone Container */}
-                <div
-                  onDragEnter={handleDrag}
-                  onDragOver={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDrop={handleDrop}
-                  className={`w-full min-h-[140px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-all duration-300 relative ${dragActive
-                      ? 'border-gold-accent bg-gold-accent/5 scale-[1.01]'
-                      : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50 hover:border-gold-accent/50'
-                    }`}
-                >
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Frame Name</label>
                   <input
-                    type="file"
-                    id="file-upload-multiple-add"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    type="text"
+                    required
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    placeholder="e.g. Zephyr Titanium Round"
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary"
                   />
-
-                  {imageUploading ? (
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                      <Loader className="h-8 w-8 animate-spin text-gold-accent" />
-                      <p className="text-[10px] font-black uppercase tracking-wider text-[#B8952A]">Uploading Frame Assets...</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-slate-500">
-                      <Plus className="h-8 w-8 stroke-[1.5] text-gold-accent" />
-                      <p className="text-[11px] font-extrabold text-navy-dark leading-none">
-                        Drag & Drop frame files here, or <span className="text-[#B8952A] hover:underline">browse</span>
-                      </p>
-                      <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Supports PNG, JPG, WEBP (Up to 5MB files)</p>
-                    </div>
-                  )}
                 </div>
 
-                {/* Previews grid if images are present */}
-                {Array.isArray(productForm.images) && productForm.images.length > 0 && (
-                  <div className="grid grid-cols-5 gap-3 mt-4">
-                    {productForm.images.map((imgUrl, index) => (
-                      <div
-                        key={index}
-                        className={`aspect-[4/3] rounded-xl border overflow-hidden bg-slate-100 relative shadow-xxs group hover:scale-[1.03] transition-all duration-300 ${index === 0 ? 'border-gold-accent ring-2 ring-gold-accent/20' : 'border-slate-200'
-                          }`}
-                        title={index === 0 ? "Primary catalogue image" : "Alternative swatch preview"}
-                      >
-                        <img src={imgUrl} alt={`Catalogue Frame ${index + 1}`} className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(index)}
-                          className="absolute top-1.5 right-1.5 bg-rose-600/90 text-white p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow hover:bg-rose-600 z-20"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                        {index === 0 && (
-                          <span className="absolute bottom-1 left-1.5 bg-gold-accent text-navy-dark text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
-                            Primary
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Brand Tier</label>
+                  <select
+                    value={productForm.brand}
+                    onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                  >
+                    <option value="EyeLeads Classic">EyeLeads Classic</option>
+                    <option value="EyeLeads Bold">EyeLeads Bold</option>
+                    <option value="EyeLeads Flexx">EyeLeads Flexx</option>
+                    <option value="EyeLeads Apex">EyeLeads Apex</option>
+                    <option value="EyeLeads Craft">EyeLeads Craft</option>
+                  </select>
+                </div>
 
-              <div className="md:col-span-2 pt-4 flex items-center justify-between border-t border-slate-100">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="prescriptionAvailable"
-                    checked={productForm.prescriptionAvailable}
-                    onChange={(e) => setProductForm({ ...productForm, prescriptionAvailable: e.target.checked })}
-                    className="h-4.5 w-4.5 rounded border-slate-300 text-gold-accent focus:ring-gold-accent cursor-pointer"
-                  />
-                  <label htmlFor="prescriptionAvailable" className="uppercase tracking-wider text-[9px] cursor-pointer">Optometry Support</label>
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Lens Category</label>
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                  >
+                    <option value="Eyeglasses">Eyeglasses</option>
+                    <option value="Sunglasses">Sunglasses</option>
+                    <option value="Computer Glasses">Computer Glasses</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Kids">Kids</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Cleaning Kits">Cleaning Kits</option>
+                  </select>
                 </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="inStockOnly"
-                    checked={productForm.inStockOnly}
-                    onChange={(e) => setProductForm({ ...productForm, inStockOnly: e.target.checked })}
-                    className="h-4.5 w-4.5 rounded border-slate-300 text-gold-accent focus:ring-gold-accent cursor-pointer"
-                  />
-                  <label htmlFor="inStockOnly" className="uppercase tracking-wider text-[9px] cursor-pointer">In Stock Only</label>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Geometric Shape</label>
+                  <select
+                    value={productForm.frameShape}
+                    onChange={(e) => setProductForm({ ...productForm, frameShape: e.target.value })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                  >
+                    <option value="Round">Round</option>
+                    <option value="Square">Square</option>
+                    <option value="Aviator">Aviator</option>
+                    <option value="Cat-Eye">Cat-Eye</option>
+                    <option value="Rectangle">Rectangle</option>
+                    <option value="Wayfarer">Wayfarer</option>
+                    <option value="Oval">Oval</option>
+                  </select>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Material Matrix</label>
                   <input
-                    type="checkbox"
-                    id="isCleaningKit"
-                    checked={productForm.isCleaningKit || false}
-                    onChange={(e) => setProductForm({ ...productForm, isCleaningKit: e.target.checked })}
-                    className="h-4.5 w-4.5 rounded border-slate-300 text-gold-accent focus:ring-gold-accent cursor-pointer"
+                    type="text"
+                    required
+                    value={productForm.material}
+                    onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
+                    list="materials-list-add"
+                    placeholder="e.g. Acetate, Carbon Fiber"
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 focus:bg-white text-text-primary text-xs font-bold"
                   />
-                  <label htmlFor="isCleaningKit" className="uppercase tracking-wider text-[9px] cursor-pointer">Cleaning Kit</label>
+                  <datalist id="materials-list-add">
+                    <option value="Acetate" />
+                    <option value="Titanium" />
+                    <option value="Metal" />
+                    <option value="TR90" />
+                    <option value="Wood" />
+                  </datalist>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Gender Target</label>
+                  <select
+                    value={productForm.gender}
+                    onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50"
+                  >
+                    <option value="Men">Men</option>
+                    <option value="Women">Women</option>
+                    <option value="Unisex">Unisex</option>
+                    <option value="Kids">Kids</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Base Frame Price (INR)</label>
                   <input
-                    type="checkbox"
-                    id="onSale"
-                    checked={productForm.onSale}
-                    onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      if (isChecked) {
-                        setProductForm(prev => ({
-                          ...prev,
-                          onSale: true,
-                          mrp: prev.price,
-                          discount: 0
-                        }));
+                    type="number"
+                    required
+                    disabled={productForm.onSale}
+                    value={productForm.price}
+                    onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-75 disabled:bg-slate-100/50 text-xs font-bold"
+                    title={productForm.onSale ? "Calculated automatically when On Sale is enabled" : ""}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">MRP Comparison Price (INR)</label>
+                  <input
+                    type="number"
+                    required
+                    value={productForm.mrp}
+                    onChange={(e) => setProductForm({ ...productForm, mrp: Number(e.target.value) })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Discount Percentage (%)</label>
+                  <input
+                    type="number"
+                    required
+                    disabled={!productForm.onSale}
+                    value={productForm.discount || 0}
+                    onChange={(e) => setProductForm({ ...productForm, discount: Number(e.target.value) })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary disabled:opacity-50 text-xs font-bold"
+                    placeholder="e.g. 10 for 10% off"
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="uppercase tracking-wider text-[9px]">Eyewear Product Warranty Terms (e.g. 1-Year Warranty)</label>
+                  <input
+                    type="text"
+                    required
+                    value={productForm.warranty || ''}
+                    onChange={(e) => setProductForm({ ...productForm, warranty: e.target.value })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary"
+                    placeholder="e.g. 1-Year Warranty"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Product Weight (Grams)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={productForm.weightGrams}
+                    onChange={(e) => setProductForm({ ...productForm, weightGrams: Number(e.target.value) })}
+                    className="w-full border border-slate-200 focus:border-gold-accent focus:outline-none rounded-xl px-4 py-3 bg-slate-50/50 text-text-primary text-xs font-bold"
+                    placeholder="e.g. 250"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="uppercase tracking-wider text-[9px]">Weight Tier Classification</label>
+                  <div className="w-full border border-slate-200 rounded-xl px-4 py-3 bg-slate-50/50 text-xs font-extrabold flex items-center justify-between min-h-[46px]">
+                    {(() => {
+                      const w = productForm.weightGrams || 0;
+                      if (w < 200) {
+                        return (
+                          <>
+                            <span className="text-emerald-600">Light Weight Tier</span>
+                            <span className="text-slate-400 font-bold">Avg. Shipping: ~₹80</span>
+                          </>
+                        );
+                      } else if (w <= 500) {
+                        return (
+                          <>
+                            <span className="text-[#B8952A]">Medium Weight Tier</span>
+                            <span className="text-slate-400 font-bold">Avg. Shipping: ~₹120</span>
+                          </>
+                        );
                       } else {
-                        setProductForm(prev => ({
-                          ...prev,
-                          onSale: false,
-                          price: prev.mrp,
-                          discount: 0
-                        }));
+                        return (
+                          <>
+                            <span className="text-rose-600">Heavy Weight Tier</span>
+                            <span className="text-slate-400 font-bold">Avg. Shipping: ~₹160</span>
+                          </>
+                        );
                       }
-                    }}
-                    className="h-4.5 w-4.5 rounded border-slate-300 text-gold-accent focus:ring-gold-accent cursor-pointer"
-                  />
-                  <label htmlFor="onSale" className="uppercase tracking-wider text-[9px] cursor-pointer">On Sale</label>
+                    })()}
+                  </div>
                 </div>
-              </div>
 
-              <div className="md:col-span-2 pt-4 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setIsAddModalOpen(false); resetProductForm(); }}
-                  className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-xl bg-navy-dark text-white hover:bg-gold-accent hover:text-navy-dark text-[10px] font-extrabold uppercase tracking-widest cursor-pointer shadow transition-colors"
-                >
-                  {productForm.category === 'Cleaning Kits' ? 'Publish Cleaning Kit' : 'Publish Eyewear Frame'}
-                </button>
-              </div>
+                <div className="md:col-span-2 pt-4 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setIsAddModalOpen(false); resetProductForm(); }}
+                    className="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-[10px] font-extrabold uppercase tracking-widest cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-xl bg-navy-dark text-white hover:bg-gold-accent hover:text-navy-dark text-[10px] font-extrabold uppercase tracking-widest cursor-pointer shadow transition-colors"
+                  >
+                    Publish Eyewear Frame
+                  </button>
+                </div>
 
-            </form>
+              </form>
+            )}
+
           </div>
         </div>
       )}
